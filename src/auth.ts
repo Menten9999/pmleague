@@ -42,6 +42,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: "/login", // カスタムログインページを使う場合
+    signIn: "/Login", // カスタムログインページを使う場合
   },
 });

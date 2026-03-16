@@ -38,7 +38,7 @@ export default function HomePage() {
               <Link href="/schedule" className="hover:text-white transition-colors">Schedule</Link>
             </div>
           </div>
-          <Link href="/Admin/Scores" className="text-[10px] border border-white/20 px-4 py-2 hover:bg-white hover:text-black transition-all">
+          <Link href="/Login" className="text-[10px] border border-white/20 px-4 py-2 hover:bg-white hover:text-black transition-all">
             ADMIN LOGIN
           </Link>
         </div>

@@ -15,7 +15,7 @@ export default function RegisterPage() {
     setError("");
 
     // ステップ2で作ったAPIにデータを送る
-    const res = await fetch("/Api/Register", {
+    const res = await fetch("/api/Register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, name, password }),

@@ -1,47 +1,39 @@
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const prisma = new PrismaClient();
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
-    Credentials({
-      // フォームの項目定義
+    CredentialsProvider({
+      name: "Credentials",
       credentials: {
-        id: { label: "ID", type: "text" },
-        password: { label: "Password", type: "password" },
+        userId: { label: "ユーザーID", type: "text" },
+        password: { label: "パスワード", type: "password" },
       },
-      authorize: async (credentials) => {
-        // --- 本来はここでデータベースを参照します ---
-        // 簡易的なモックユーザー例
-        const users = [
-          { id: "admin01", name: "責任者A", password: "password123", role: "ADMIN" },
-          { id: "manager01", name: "ドリブンズ監督", password: "password123", role: "MANAGER", teamId: "team_a" },
-        ];
+      async authorize(credentials) {
+        if (!credentials?.userId || !credentials?.password) return null;
 
-        const user = users.find(u => u.id === credentials.id && u.password === credentials.password);
-        
+        const user = await prisma.user.findUnique({
+          where: { userId: credentials.userId as string },
+        });
+
         if (!user) return null;
-        return { id: user.id, name: user.name, role: user.role, teamId: user.teamId };
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.password
+        );
+
+        if (!isPasswordValid) return null;
+
+        return { id: user.id, name: user.name };
       },
     }),
   ],
-  callbacks: {
-    // セッションデータに role と teamId を含める設定
-    jwt({ token, user }) {
-      if (user) {
-        token.role = (user as any).role;
-        token.teamId = (user as any).teamId;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      if (session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).teamId = token.teamId;
-      }
-      return session;
-    },
-  },
   pages: {
-    signIn: "/Login", // カスタムログインページを使う場合
+    signIn: "/Login",
   },
 });

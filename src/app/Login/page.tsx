@@ -20,7 +20,7 @@ export default function LoginPage() {
     try {
       // Auth.ts で設定した credentials 認証を呼び出す
       const result = await signIn("credentials", {
-        id: userId,
+        userId: userId,
         password: password,
         redirect: false, // 自分でエラーハンドリングするため
       });

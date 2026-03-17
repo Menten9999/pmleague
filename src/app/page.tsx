@@ -34,7 +34,7 @@ export default function HomePage() {
             </Link>
             <div className="hidden md:flex gap-8 text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400">
               <Link href="/Rankings" className="hover:text-white transition-colors">Rankings</Link>
-              <Link href="/teams" className="hover:text-white transition-colors">Teams</Link>
+              <Link href="/Teams" className="hover:text-white transition-colors">Teams</Link>
               <Link href="/schedule" className="hover:text-white transition-colors">Schedule</Link>
             </div>
           </div>

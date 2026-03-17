@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl=env("DIRECT_URL")
+}
+
+// ユーザー（管理者・監督）
+model User {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  password  String
+  name      String
+  role      Role     @default(MANAGER)
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+// チーム
+model Team {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  color       String?
+  totalScore  Float    @default(0.0)
+  players     Player[]
+  users       User[]
+}
+
+// 選手
+model Player {
+  id           String        @id @default(cuid())
+  name         String
+  teamId       String
+  team         Team          @relation(fields: [teamId], references: [id])
+  totalScore   Float         @default(0.0)
+  matchResults MatchResult[]
+}
+
+// 試合
+model Match {
+  id        String        @id @default(cuid())
+  date      DateTime      @default(now())
+  title     String?
+  status    MatchStatus   @default(SCHEDULED)
+  results   MatchResult[]
+}
+
+enum MatchStatus {
+  SCHEDULED
+  FINISHED
+}
+
+// 試合ごとの各選手の成績
+model MatchResult {
+  id        String   @id @default(cuid())
+  matchId   String
+  match     Match    @relation(fields: [matchId], references: [id])
+  playerId  String
+  player    Player   @relation(fields: [playerId], references: [id])
+  wind      Wind?
+  rawScore  Int?
+  points    Float?
+  rank      Int?
+}
+
+enum Wind {
+  EAST
+  SOUTH
+  WEST
+  NORTH
+}

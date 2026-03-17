@@ -15,7 +15,7 @@ export default function RegisterPage() {
     setError("");
 
     // ステップ2で作ったAPIにデータを送る
-    const res = await fetch("/api/register", {
+    const res = await fetch("/Api/Register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, name, password }),
@@ -23,7 +23,7 @@ export default function RegisterPage() {
 
     if (res.ok) {
       alert("アカウント登録が完了しました！ログインしてください。");
-      router.push("./Login"); // 成功したらログイン画面へ移動
+      router.push("/Login"); // 成功したらログイン画面へ移動
     } else {
       const data = await res.json();
       setError(data.error || "登録に失敗しました");

@@ -1,62 +1,65 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-
+import bcrypt from "bcryptjs";
+export const dynamic = 'force-dynamic';
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
-  try {
-    const { name, color, playerNames } = await req.json();
-
-    if (!name) {
-      return NextResponse.json({ error: "チーム名は必須です" }, { status: 400 });
-    }
-
-    // 既に同じチーム名がないかチェック
-    const existingTeam = await prisma.team.findUnique({ where: { name } });
-    if (existingTeam) {
-      return NextResponse.json({ error: "このチーム名は既に登録されています" }, { status: 400 });
-    }
-
-    // チームと選手をまとめてデータベースに保存（Prismaの強力な機能）
-    const team = await prisma.team.create({
-      data: {
-        name,
-        color,
-        players: {
-          // 入力された選手名リストから、空欄のものを除外して登録
-          create: playerNames
-            .filter((pName: string) => pName.trim() !== "")
-            .map((pName: string) => ({ name: pName })),
-        },
-      },
-      include: {
-        players: true, // 保存した結果に選手情報も含めて返す
-      },
-    });
-
-    return NextResponse.json({ message: "チームと選手を登録しました！", team }, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "登録中にエラーが発生しました" }, { status: 500 });
-  }
-}
-// --- 以下のコードを一番下に追記してください ---
-
+// 1. ユーザー一覧を取得する（GET）
 export async function GET() {
   try {
-    // 全チームと所属選手をデータベースから取得
-    const teams = await prisma.team.findMany({
-      include: {
-        players: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
+    const users = await prisma.user.findMany({
+      orderBy: { name: 'asc' }, // 名前順で取得
     });
-    return NextResponse.json(teams);
+
+    // セキュリティのため、暗号化されたパスワードは除外して画面に送る
+    const safeUsers = users.map(u => ({
+      id: u.id,
+      userId: u.userId,
+      name: u.name,
+      role: u.role,
+    }));
+
+    return NextResponse.json(safeUsers);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "チーム情報の取得に失敗しました" }, { status: 500 });
+    return NextResponse.json({ error: "ユーザー取得エラー" }, { status: 500 });
+  }
+}
+
+// 2. パスワードを強制リセットする（PATCH）
+export async function PATCH(req: Request) {
+  try {
+    const { id, newPassword } = await req.json();
+
+    if (!newPassword || newPassword.length < 4) {
+      return NextResponse.json({ error: "パスワードは4文字以上で入力してください" }, { status: 400 });
+    }
+
+    // 新しいパスワードを再度暗号化
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
+
+    return NextResponse.json({ message: "パスワードをリセットしました！" }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: "パスワード更新エラー" }, { status: 500 });
+  }
+}
+
+// 3. アカウントを削除する（DELETE）
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+    
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "アカウントを削除しました" }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: "アカウント削除エラー" }, { status: 500 });
   }
 }
 // --- 以下のコードを一番下に追記してください ---

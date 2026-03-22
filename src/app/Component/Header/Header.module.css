@@ -1,0 +1,191 @@
+/* src/app/Component/Header.module.css */
+
+/* =========================================
+   ヘッダー大枠（スクロールしてもカッコいい半透明の漆黒）
+   ========================================= */
+.headerContainer {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background-color: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+/* ヘッダーの下にうっすらと光るゴールドのライン */
+.headerContainer::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(234, 179, 8, 0.5), transparent);
+}
+
+/* =========================================
+   ロゴテキスト（マウスを乗せると動くゴールドになる）
+   ========================================= */
+.logoText {
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.logoGroup:hover .logoText {
+  background: linear-gradient(to right, #b48530 0%, #eab308 25%, #fef08a 50%, #eab308 75%, #b48530 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: shine 5s linear infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+/* =========================================
+   ナビゲーションリンク（Mリーグ風のアンダーライン）
+   ========================================= */
+.navLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 80px; /* ヘッダーの高さに合わせる */
+  color: #a1a1aa; /* 普段はグレー */
+  font-size: 0.875rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.navLink:hover {
+  color: #eab308; /* ホバーでゴールド */
+}
+
+/* 下からスッと現れるアンダーライン */
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #eab308;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navLink:hover::after {
+  transform: scaleX(1);
+}
+
+/* =========================================
+   ナナメに切り取られたボタン（Admin用とLogin用）
+   ========================================= */
+.skewBtnAdmin, .skewBtnLogin {
+  display: inline-block;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+  transform: skewX(-12deg);
+  text-decoration: none;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Admin用：ゴールド枠 */
+.skewBtnAdmin {
+  border: 1px solid #eab308;
+  color: #eab308;
+  background-color: rgba(234, 179, 8, 0.1);
+}
+
+.skewBtnAdmin:hover {
+  background-color: #eab308;
+  color: #000;
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+}
+
+/* Login用：グレー枠（目立ちすぎないように） */
+.skewBtnLogin {
+  border: 1px solid #333;
+  color: #888;
+}
+
+.skewBtnLogin:hover {
+  border-color: #fff;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+/* 中の文字を真っ直ぐに戻す */
+.skewBtnAdmin span, .skewBtnLogin span {
+  display: block;
+  transform: skewX(12deg);
+}
+.innerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 5rem; /* 80px */
+  max-width: 80rem; /* max-w-7xl相当 */
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ロゴ部分（画面が狭くても縮まないようにする） */
+.logoGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0; /* 縮小防止 */
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ナビゲーション全体（スマホなど画面が狭い場合は横スクロールさせる） */
+.navWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  margin-left: 1rem;
+  overflow-x: auto; /* 横スクロール許可 */
+  
+  /* スクロールバーを隠す（スタイリッシュに見せるため） */
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.navWrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* リンクのリスト（絶対に折り返さず、1行に並べる） */
+.navLinks {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
+  white-space: nowrap; /* 改行防止 */
+  margin-right: 1.5rem;
+}
+
+/* ログイン・管理ボタンエリア（左に仕切り線を入れる） */
+.authSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 2.5rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0; /* 縮小防止 */
+}

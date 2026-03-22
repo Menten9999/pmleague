@@ -78,3 +78,11 @@ enum Wind {
   WEST
   NORTH
 }
+// --- 以下のモデルを一番下に追記 ---
+
+model SeasonArchive {
+  id        String   @id @default(cuid())
+  title     String   // 「第1期 PMリーグ」などのシーズン名
+  data      String   // その時点でのチームと個人の全ランキングを文字（JSON）として保存
+  createdAt DateTime @default(now())
+}

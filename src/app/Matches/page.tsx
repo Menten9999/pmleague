@@ -1,3 +1,60 @@
+import { PrismaClient } from '@prisma/client';
+import Link from 'next/link';
+
+const prisma = new PrismaClient();
+
+// 常に最新のデータベース情報を取得する設定
+export const revalidate = 0;
+
+export default async function MatchesPage() {
+  // 1. 終了した試合（履歴）を新しい順に取得
+  const finishedMatches = await prisma.match.findMany({
+    where: { status: 'FINISHED' },
+    orderBy: { id: 'desc' }, // 新しい順（とりあえずID降順で代用）
+    include: {
+      results: {
+        orderBy: { points: 'desc' }, // ポイントが高い順（1着〜4着）に並べ替え
+        include: {
+          player: {
+            include: { team: true }, // 所属チームの情報も引っ張ってくる
+          },
+        },
+      },
+    },
+  });
+
+  // 2. 予定されている試合（次回日程）を取得
+  const scheduledMatches = await prisma.match.findMany({
+    where: { status: 'SCHEDULED' },
+    orderBy: { id: 'asc' },
+    include: {
+      results: {
+        include: {
+          player: {
+            include: { team: true },
+          },
+        },
+      },
+    },
+  });
+  
+  // 一番近い予定を「次回予告」として扱う
+  const nextMatch = scheduledMatches[0];
+
+  return (
+    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans">
+      <div className="max-w-5xl mx-auto mt-10">
+        
+        {/* ヘッダー */}
+        <div className="text-center mb-16 border-b border-white/10 pb-6">
+          <h1 className="text-5xl font-black italic tracking-tighter text-yellow-500">
+            MATCHES
+          </h1>
+          <p className="text-gray-500 text-sm mt-2 tracking-[0.3em] uppercase font-bold">
+            試合日程・結果
+          </p>
+        </div>
+
 {/* =========================================
             次回予告（NEXT MATCH）セクション
             ========================================= */}
@@ -20,7 +77,7 @@
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {/* 🌟 ID順（登録した順）に並べ替えてから表示する */}
-                {[...nextMatch.results].sort((a, b) => a.id - b.id).map((res, i) => {
+                {[...nextMatch.results].sort((a, b) => String(a.id).localeCompare(String(b.id))).map((res, i) => {
                   const winds = ["東", "南", "西", "北"];
                   const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
 
@@ -56,3 +113,78 @@
             </div>
           )}
         </section>
+        {/* =========================================
+            試合結果（MATCH HISTORY）セクション
+            ========================================= */}
+        <section>
+          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-6">
+            <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">
+              MATCH HISTORY
+            </h2>
+            <span className="text-[10px] text-gray-500 tracking-widest uppercase">過去の試合結果</span>
+          </div>
+
+          <div className="space-y-8">
+            {finishedMatches.map((match) => (
+              <div key={match.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden hover:border-white/30 transition-colors">
+                
+                {/* 試合タイトル帯 */}
+                <div className="bg-black/50 border-b border-white/10 px-6 py-3 flex justify-between items-center">
+                  <div className="font-bold tracking-widest text-yellow-500">{match.title}</div>
+                </div>
+
+                {/* 順位（1着〜4着）のリスト */}
+                <div className="p-4 sm:p-6 space-y-2">
+                  {match.results.map((res, index) => {
+                    // 順位ごとの文字色を設定（1着=金、2着=銀、3着=銅、4着=灰）
+                    const rankColors = ["text-yellow-400", "text-gray-300", "text-amber-600", "text-gray-600"];
+                    const rankColor = rankColors[index] || "text-gray-500";
+
+                    return (
+                      <div key={res.id} className="flex items-center justify-between bg-black/30 border border-white/5 p-3 rounded-sm relative overflow-hidden">
+                        {/* チームカラーのサイドライン */}
+                        <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: res.player.team?.color || '#333' }}></div>
+                        
+                        <div className="flex items-center gap-4 pl-4 flex-grow">
+                          <div className={`font-black italic text-xl ${rankColor} w-8`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <div className="text-[10px] text-gray-500 tracking-widest uppercase">{res.player.team?.name}</div>
+                            <div className="font-bold text-white tracking-wider">{res.player.name}</div>
+                          </div>
+                        </div>
+
+                        <div className="text-right pr-2">
+                          <div className="text-[10px] text-gray-500 tracking-widest uppercase mb-0.5">
+                            {(res.rawScore ?? 0).toLocaleString()}
+                          </div>
+                          <div className={`text-lg font-mono font-bold ${(res.points ?? 0) >= 0 ? 'text-white' : 'text-red-500'}`}>
+                            {(res.points ?? 0) > 0 ? '+' : ''}{(res.points ?? 0).toFixed(1)}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {finishedMatches.length === 0 && (
+              <div className="text-center text-gray-500 py-20 font-bold tracking-widest">
+                まだ試合結果がありません。
+              </div>
+            )}
+          </div>
+        </section>
+        
+        <div className="mt-16 text-center pb-10">
+           <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors tracking-widest uppercase">
+             ← BACK TO TOP
+           </Link>
+        </div>
+
+      </div>
+    </main>
+  );
+}

@@ -1,21 +1,106 @@
-@layer utilities {
-  /* PM LEAGUEの文字が浮かび上がるアニメーション */
-  .animate-reveal {
-    animation: reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* サイト全体のベース設定 */
+  body {
+    background-color: #050505; /* 漆黒 */
+    color: #ffffff;
+    /* フォントを滑らかに、シャープに見せる魔法の記述 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* 背景が上にスライドして消えるアニメーション */
-  .animate-slide-up-fade {
-    animation: slideUpFade 0.8s ease-in-out 2.2s forwards;
+  /* 🌟 マウスでテキストを選択した時の色をゴールドに変更 */
+  ::selection {
+    background-color: #eab308; 
+    color: #000000;
   }
 }
 
-@keyframes reveal {
-  0% { transform: translateY(30px); opacity: 0; letter-spacing: 0.5em; }
-  100% { transform: translateY(0); opacity: 1; letter-spacing: 0.1em; }
+@layer components {
+  /* 🌟 Mリーグ風の斜めストライプ背景（うっすらとした模様） */
+  .bg-m-stripe {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.02) 4px,
+      rgba(255, 255, 255, 0.02) 5px
+    );
+  }
+
+  /* 🌟 Mリーグ風の「動く」ゴールドグラデーションテキスト */
+  .text-gold-gradient {
+    /* 金属のような輝きを持つグラデーション */
+    background: linear-gradient(
+      to right, 
+      #b48530 0%, 
+      #eab308 25%, 
+      #fef08a 50%, 
+      #eab308 75%, 
+      #b48530 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% auto;
+    /* 5秒かけてキラリと光るアニメーション */
+    animation: shine 5s linear infinite;
+  }
+
+  /* 🌟 ゴールドのグロウ（発光）エフェクトのパネル */
+  .glow-panel {
+    background-color: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 20px rgba(0,0,0,1);
+    transition: all 0.3s ease;
+  }
+  
+  .glow-panel:hover {
+    border-color: rgba(234, 179, 8, 0.5); /* ホバーでゴールドの枠線 */
+    box-shadow: 0 0 30px rgba(234, 179, 8, 0.15), inset 0 0 20px rgba(0,0,0,1);
+  }
 }
 
-@keyframes slideUpFade {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-100%); opacity: 0; visibility: hidden; }
+/* =========================================
+   Mリーグ風 カスタムスクロールバー
+   （画面右側のスクロールバーをカッコよくする）
+   ========================================= */
+::-webkit-scrollbar {
+  width: 6px; /* 極細でスタイリッシュに */
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333; /* 普段はダークグレー */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #eab308; /* マウスを乗せるとゴールドに光る！ */
+}
+
+/* =========================================
+   アニメーション定義
+   ========================================= */
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* 内部のスクロールバーを隠すユーティリティ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

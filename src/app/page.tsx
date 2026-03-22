@@ -1,104 +1,151 @@
-"use client";
+import Link from "next/link";
+import { PrismaClient } from "@prisma/client";
+import { auth } from "@/auth";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+// CSSモジュールを読み込む
+import styles from "./page.module.css";
 
-export default function HomePage() {
-  const [isMounted, setIsMounted] = useState(false);
+const prisma = new PrismaClient();
+export const revalidate = 0;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+export default async function Home() {
+  const session = await auth();
 
-  if (!isMounted) return <div className="bg-black min-h-screen" />;
+  const nextMatch = await prisma.match.findFirst({
+    where: { status: "SCHEDULED" },
+    orderBy: { id: "asc" },
+    include: {
+      results: { include: { player: { include: { team: true } } } },
+    },
+  });
+
+  const topTeams = await prisma.team.findMany({
+    orderBy: { totalScore: "desc" },
+    take: 4,
+  });
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white selection:bg-yellow-500 selection:text-black">
+    <main className="min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden">
       
-      {/* スプラッシュ画面: 2.2秒後に上にスライドして消える */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black animate-slide-up-fade">
-        <div className="text-center">
-          <h1 className="text-6xl md:text-9xl font-black italic tracking-[0.2em] text-yellow-500 animate-reveal">
-            PM LEAGUE
+      {/* =========================================
+          HERO セクション（キービジュアル）
+          ========================================= */}
+      <section className={`${styles.mStripeBg} relative w-full h-[80vh] flex flex-col items-center justify-center border-b border-yellow-600/30 overflow-hidden`}>
+        <div className="absolute inset-0 bg-[url('https://placehold.co/1920x1080/111111/333333?text=KEY+VISUAL+IMAGE')] bg-cover bg-center bg-no-repeat opacity-20 mix-blend-luminosity scale-105 animate-[pulse_10s_ease-in-out_infinite_alternate]"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-black/80"></div>
+        
+        {/* 🌟 アニメーションクラス（fadeInUp）を適用 */}
+        <div className={`${styles.fadeInUp} relative z-10 text-center flex flex-col items-center`}>
+          <div className="w-1 h-24 bg-gradient-to-b from-yellow-300 to-yellow-700 transform rotate-45 mb-6"></div>
+          
+          <h1 className="text-6xl md:text-9xl font-black italic tracking-tighter drop-shadow-2xl">
+            <span className="text-white">PM </span>
+            <span className={styles.textGoldGradient}>LEAGUE</span>
           </h1>
-          <div className="mt-4 h-[1px] bg-yellow-500/50 w-0 animate-[shimmer_1.5s_ease-in-out_forwards] mx-auto"></div>
+          <p className="mt-6 text-yellow-500 tracking-[0.5em] text-sm md:text-lg font-bold">
+            THE PREMIER MAHJONG STAGE
+          </p>
         </div>
-      </div>
+      </section>
 
-      {/* メインナビゲーション */}
-      <nav className="fixed top-0 w-full z-40 bg-black/60 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-black italic tracking-tighter text-yellow-500 hover:opacity-80 transition-opacity">
-              PM LEAGUE
-            </Link>
-            <div className="hidden md:flex gap-8 text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400">
-              <Link href="/Rankings" className="hover:text-white transition-colors">Rankings</Link>
-              <Link href="/Teams" className="hover:text-white transition-colors">Teams</Link>
-              <Link href="/schedule" className="hover:text-white transition-colors">Schedule</Link>
-            </div>
+      {/* 🌟 中央揃え＆サイズ制御のメインコンテナ（mainContainer） */}
+      <div className={styles.mainContainer}>
+        
+        {/* =========================================
+            NEXT MATCH（次回予告）
+            ========================================= */}
+        {/* 🌟 少し遅れてアニメーション（fadeInUp delay1） */}
+        <section className={`${styles.sectionWrapper} ${styles.fadeInUp} ${styles.delay1}`}>
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black italic tracking-wider text-white">
+              NEXT <span className="text-yellow-500">MATCH</span>
+            </h2>
+            <span className="text-xs text-yellow-600 tracking-[0.3em] uppercase mt-2 block">次回対戦カード</span>
           </div>
-          <Link href="/Login" className="text-[10px] border border-white/20 px-4 py-2 hover:bg-white hover:text-black transition-all">
-            ADMIN LOGIN
-          </Link>
-        </div>
-      </nav>
 
-      {/* ヒーローセクション: 次の対局 */}
-      <div className="pt-32 pb-20 px-6">
-        <section className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="w-12 h-[1px] bg-yellow-500"></span>
-                <span className="text-yellow-500 text-xs font-bold tracking-[0.3em] uppercase">Next Match</span>
+          {nextMatch ? (
+            <div className={`${styles.glowPanel} p-1 md:p-2 relative group max-w-5xl`}>
+              <div className="bg-[#0a0a0a] p-8 md:p-12">
+                <div className="text-center mb-10">
+                  <div className="inline-block bg-yellow-500 text-black font-bold tracking-widest px-8 py-2 text-xl transform -skew-x-12">
+                    <span className="block transform skew-x-12">{nextMatch.title}</span>
+                  </div>
+                </div>
+
+                {/* 🌟 選手カードを均等に中央に並べるグリッド（matchGrid） */}
+                <div className={styles.matchGrid}>
+                  {[...nextMatch.results].sort((a, b) => String(a.id).localeCompare(String(b.id))).map((res, i) => {
+                    const winds = ["東", "南", "西", "北"];
+                    const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
+
+                    return (
+                      <div key={res.id} className="relative bg-[#111] p-6 text-center border border-white/5 hover:border-white/20 hover:bg-[#151515] transition-all flex flex-col items-center justify-center min-h-[200px]">
+                        <div className="absolute inset-0 bg-[url('https://placehold.co/400x600/222222/444444?text=PLAYER')] bg-cover bg-center opacity-10 mix-blend-luminosity"></div>
+                        <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
+                        
+                        <div className="z-10 relative mt-auto">
+                          <div className={`text-xl font-black italic ${windColors[i]} mb-2`}>{winds[i]}家</div>
+                          <div className="text-xs text-gray-400 tracking-widest uppercase mb-1">{res.player.team?.name}</div>
+                          <div className="text-2xl font-bold text-white tracking-wider">{res.player.name}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter">第1試合 出場選手</h2>
             </div>
-            <div className="text-right">
-              <p className="text-gray-500 font-mono text-sm">2024.03.20 SUN 19:00 START</p>
+          ) : (
+            <div className={`${styles.glowPanel} p-16 text-center max-w-3xl`}>
+              <div className="text-gray-500 font-bold tracking-widest">次節の対戦カードは現在調整中です。</div>
             </div>
-          </div>
+          )}
+          
+          <Link href="/Matches" className={styles.skewButton}>
+            <span>試合一覧を見る</span>
+          </Link>
+        </section>
 
-          {/* 出場選手カードグリッド */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { team: "TEAM RED", name: "選手 A", wind: "東", color: "bg-red-600" },
-              { team: "TEAM BLUE", name: "選手 B", wind: "南", color: "bg-blue-600" },
-              { team: "TEAM GREEN", name: "選手 C", wind: "西", color: "bg-emerald-600" },
-              { team: "TEAM GOLD", name: "選手 D", wind: "北", color: "bg-amber-500" },
-            ].map((p, i) => (
-              <div key={i} className="group relative bg-[#111] border border-white/5 aspect-[3/4] overflow-hidden flex flex-col justify-end p-8 transition-all hover:border-white/20">
-                {/* チームカラーのオーバーレイ */}
-                <div className={`absolute top-0 left-0 w-full h-1 ${p.color}`}></div>
-                <div className="absolute top-8 right-8 text-6xl font-black italic text-white/5 select-none">{p.wind}</div>
+        {/* =========================================
+            STANDINGS（ランキング）
+            ========================================= */}
+        {/* 🌟 さらに遅れてアニメーション（fadeInUp delay2） */}
+        <section className={`${styles.sectionWrapper} ${styles.fadeInUp} ${styles.delay2}`}>
+           <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black italic tracking-wider text-white">
+              TEAM <span className="text-yellow-500">STANDINGS</span>
+            </h2>
+            <span className="text-xs text-yellow-600 tracking-[0.3em] uppercase mt-2 block">チームランキング速報</span>
+          </div>
+          
+          {/* 🌟 ランキングをスリムに中央配置（standingsWrapper） */}
+          <div className={styles.standingsWrapper}>
+            {topTeams.map((team, index) => (
+              <div key={team.id} className="bg-[#111] hover:bg-[#1a1a1a] border border-white/5 hover:border-white/20 p-6 flex items-center transition-all relative overflow-hidden group">
+                <div className="absolute left-0 top-0 bottom-0 w-2" style={{ backgroundColor: team.color || '#eab308' }}></div>
                 
-                <div className="relative z-10">
-                  <p className="text-xs font-bold text-gray-500 mb-1 tracking-widest">{p.team}</p>
-                  <h3 className="text-3xl font-bold mb-4 tracking-tight">{p.name}</h3>
-                  <div className="h-0.5 w-0 group-hover:w-full transition-all duration-500 bg-white/30"></div>
+                <div className="w-16 text-center font-black italic text-4xl text-gray-700 group-hover:text-yellow-500 transition-colors">
+                  {index + 1}
+                </div>
+                
+                <div className="w-12 h-12 bg-black border border-white/10 rounded-full mx-4 flex items-center justify-center shrink-0">
+                  <span className="text-[8px] text-gray-500">LOGO</span>
+                </div>
+
+                <div className="flex-grow font-bold tracking-wider text-xl">{team.name}</div>
+                
+                <div className={`text-3xl font-mono font-black italic ${team.totalScore >= 0 ? 'text-white' : 'text-red-500'}`}>
+                  {team.totalScore > 0 ? '+' : ''}{team.totalScore.toFixed(1)}
                 </div>
               </div>
             ))}
           </div>
-        </section>
-      </div>
 
-      {/* 下部のリンクエリア */}
-      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-white/5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <Link href="/rankings" className="group p-10 bg-[#0a0a0a] border border-white/5 hover:bg-white hover:text-black transition-all">
-            <span className="text-xs font-bold tracking-widest block mb-2">01</span>
-            <h4 className="text-3xl font-black italic">RANKINGS & SCORES →</h4>
-            <p className="mt-4 text-sm text-gray-500 group-hover:text-black/60">最新のチーム順位と個人成績を確認する</p>
+          <Link href="/Rankings" className={styles.skewButton}>
+            <span>ランキング詳細を見る</span>
           </Link>
-          <Link href="/manager/roster" className="group p-10 bg-[#0a0a0a] border border-white/5 hover:bg-white hover:text-black transition-all">
-            <span className="text-xs font-bold tracking-widest block mb-2">02</span>
-            <h4 className="text-3xl font-black italic">MANAGER PORTAL →</h4>
-            <p className="mt-4 text-sm text-gray-500 group-hover:text-black/60">監督専用ページ：出場選手の登録・変更</p>
-          </Link>
-        </div>
-      </section>
+        </section>
+
+      </div>
     </main>
   );
 }

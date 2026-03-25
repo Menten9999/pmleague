@@ -13,8 +13,8 @@ type Team = {
 export default function TeamRegistrationPage() {
   const [teamName, setTeamName] = useState('');
   const [teamColor, setTeamColor] = useState('');
-  // 麻雀リーグなので、最大4名まで入力できるように枠を用意
-  const [playerNames, setPlayerNames] = useState(['', '', '', '']);
+  // 最大5名まで入力できるように枠を用意
+  const [playerNames, setPlayerNames] = useState(['', '', '', '', '']);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -64,7 +64,7 @@ export default function TeamRegistrationPage() {
         // 成功したらフォームを空っぽにリセットする
         setTeamName('');
         setTeamColor('');
-        setPlayerNames(['', '', '', '']);
+        setPlayerNames(['', '', '', '', '']);
         fetchTeams();
       }
     } catch (err) {
@@ -138,7 +138,7 @@ export default function TeamRegistrationPage() {
             {/* 選手情報セクション */}
             <div className="space-y-4">
               <h2 className="text-sm font-bold text-yellow-500 tracking-widest uppercase border-b border-white/10 pb-2">Players</h2>
-              <p className="text-xs text-gray-500">※所属する選手名を入力してください（空欄の枠は登録されません）</p>
+              <p className="text-xs text-gray-500">※所属する選手名を入力してください（最大5名・空欄の枠は登録されません）</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {playerNames.map((name, index) => (

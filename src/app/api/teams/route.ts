@@ -20,15 +20,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "このチーム名は既に登録されています" }, { status: 400 });
     }
 
+    const normalizedPlayerNames = Array.isArray(playerNames)
+      ? playerNames
+          .map((pName: string) => pName.trim())
+          .filter((pName: string) => pName !== "")
+      : [];
+
+    if (normalizedPlayerNames.length > 5) {
+      return NextResponse.json({ error: "選手登録は最大5名までです" }, { status: 400 });
+    }
+
     // チームと選手をまとめてデータベースに保存
     const team = await prisma.team.create({
       data: {
         name,
         color,
         players: {
-          create: playerNames
-            .filter((pName: string) => pName.trim() !== "")
-            .map((pName: string) => ({ name: pName })),
+          create: normalizedPlayerNames.map((pName: string) => ({ name: pName })),
         },
       },
       include: {
@@ -67,6 +75,18 @@ export async function PATCH(req: Request) {
 
     if (!id || !name) {
       return NextResponse.json({ error: "チーム名とIDは必須です" }, { status: 400 });
+    }
+
+    if (!Array.isArray(players)) {
+      return NextResponse.json({ error: "選手データの形式が不正です" }, { status: 400 });
+    }
+
+    const enteredPlayersCount = players.filter(
+      (p: { id?: string; name?: string }) => (p.name || "").trim() !== ""
+    ).length;
+
+    if (enteredPlayersCount > 5) {
+      return NextResponse.json({ error: "選手登録は最大5名までです" }, { status: 400 });
     }
 
     // 1. チーム名とカラーを更新

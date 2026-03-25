@@ -16,8 +16,14 @@ export default function TeamEditPage() {
   // 編集用の入力データ
   const [teamName, setTeamName] = useState('');
   const [teamColor, setTeamColor] = useState('');
-  // 常に4人分の枠を用意する（既存選手はID入り、空き枠はIDなし）
-  const [players, setPlayers] = useState([{ id: '', name: '' }, { id: '', name: '' }, { id: '', name: '' }, { id: '', name: '' }]);
+  // 常に5人分の枠を用意する（既存選手はID入り、空き枠はIDなし）
+  const [players, setPlayers] = useState([
+    { id: '', name: '' },
+    { id: '', name: '' },
+    { id: '', name: '' },
+    { id: '', name: '' },
+    { id: '', name: '' },
+  ]);
   
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -46,7 +52,7 @@ export default function TeamEditPage() {
     setSelectedTeamId(team.id);
     setTeamName(team.name);
     setTeamColor(team.color || '');
-    const newPlayers = Array(4)
+    const newPlayers = Array(5)
       .fill({ id: '', name: '' })
       .map((_, i) => {
         return team.players[i]
@@ -66,7 +72,13 @@ export default function TeamEditPage() {
       // 未選択に戻した場合
       setTeamName('');
       setTeamColor('');
-      setPlayers([{ id: '', name: '' }, { id: '', name: '' }, { id: '', name: '' }, { id: '', name: '' }]);
+      setPlayers([
+        { id: '', name: '' },
+        { id: '', name: '' },
+        { id: '', name: '' },
+        { id: '', name: '' },
+        { id: '', name: '' },
+      ]);
       return;
     }
 
@@ -76,8 +88,8 @@ export default function TeamEditPage() {
       setTeamName(team.name);
       setTeamColor(team.color || '');
       
-      // 最大4人分のデータ枠を作成する
-      const newPlayers = Array(4).fill({ id: '', name: '' }).map((_, i) => {
+      // 最大5人分のデータ枠を作成する
+      const newPlayers = Array(5).fill({ id: '', name: '' }).map((_, i) => {
         return team.players[i] ? { id: team.players[i].id, name: team.players[i].name } : { id: '', name: '' };
       });
       setPlayers(newPlayers);
@@ -196,7 +208,7 @@ export default function TeamEditPage() {
 
               <div className="space-y-4">
                 <h2 className="text-sm font-bold text-yellow-500 tracking-widest uppercase border-b border-white/10 pb-2">Players</h2>
-                <p className="text-xs text-gray-500">※名前を書き換えると更新されます。空欄に新しく入力すると「追加メンバー」になります。</p>
+                <p className="text-xs text-gray-500">※名前を書き換えると更新されます。空欄に新しく入力すると「追加メンバー」になります（最大5名）。</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {players.map((player, index) => (

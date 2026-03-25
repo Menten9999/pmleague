@@ -2,11 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 type Player = { id: string; name: string };
 type Team = { id: string; name: string; color: string; players: Player[] };
 
 export default function TeamEditPage() {
+  const searchParams = useSearchParams();
+  const preselectedTeamId = searchParams.get('teamId') || '';
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState('');
   
@@ -33,6 +36,25 @@ export default function TeamEditPage() {
   useEffect(() => {
     fetchTeams();
   }, []);
+
+  useEffect(() => {
+    if (!preselectedTeamId || teams.length === 0) return;
+
+    const team = teams.find((t) => t.id === preselectedTeamId);
+    if (!team) return;
+
+    setSelectedTeamId(team.id);
+    setTeamName(team.name);
+    setTeamColor(team.color || '');
+    const newPlayers = Array(4)
+      .fill({ id: '', name: '' })
+      .map((_, i) => {
+        return team.players[i]
+          ? { id: team.players[i].id, name: team.players[i].name }
+          : { id: '', name: '' };
+      });
+    setPlayers(newPlayers);
+  }, [preselectedTeamId, teams]);
 
   // 編集するチームを選んだ時の処理
   const handleSelectTeam = (e: React.ChangeEvent<HTMLSelectElement>) => {

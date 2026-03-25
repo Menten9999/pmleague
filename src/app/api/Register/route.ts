@@ -6,6 +6,16 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        {
+          error:
+            "DATABASE_URL が未設定です。Vercel の Environment Variables に設定してください",
+        },
+        { status: 500 }
+      );
+    }
+
     // 🌟 画面から teamName（チーム名） も受け取るように追加
     const body = await req.json();
     const userId = String(body.userId ?? "").trim();
@@ -71,7 +81,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "データベースに接続できません。Vercelの環境変数（DATABASE_URL / DIRECT_URL）を確認してください",
+            "データベースに接続できません。Vercelの環境変数 DATABASE_URL を確認してください",
         },
         { status: 500 }
       );

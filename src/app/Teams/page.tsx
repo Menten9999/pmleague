@@ -34,7 +34,11 @@ export default async function TeamsPage() {
         {/* チーム一覧のグリッド表示 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {teams.map((team) => (
-            <Link href={`/Teams/${team.id}`} key={team.id} className="group">
+            <Link
+              href={`/Teams/${team.id}`}
+              key={team.id}
+              className="group block no-underline text-inherit focus:outline-none"
+            >
               <div className="bg-[#111] border border-white/10 rounded-sm overflow-hidden transition-all duration-300 hover:border-yellow-500 hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] hover:-translate-y-1 h-full flex flex-col">
                 
                 {/* チームカラーのトップライン（登録がなければゴールド） */}
@@ -44,7 +48,7 @@ export default async function TeamsPage() {
                 ></div>
                 
                 <div className="p-8 flex-grow flex flex-col justify-center items-center text-center space-y-4">
-                  <h2 className="text-3xl font-black italic tracking-wider text-white group-hover:text-yellow-500 transition-colors">
+                  <h2 className="text-3xl font-black italic tracking-wider text-white no-underline group-hover:text-yellow-500 transition-colors">
                     {team.name}
                   </h2>
                   <div className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase">

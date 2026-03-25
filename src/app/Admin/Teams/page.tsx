@@ -1,15 +1,37 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+
+type Team = {
+  id: string;
+  name: string;
+  color?: string | null;
+  players: { id: string; name: string }[];
+};
 
 export default function TeamRegistrationPage() {
   const [teamName, setTeamName] = useState('');
   const [teamColor, setTeamColor] = useState('');
   // 麻雀リーグなので、最大4名まで入力できるように枠を用意
   const [playerNames, setPlayerNames] = useState(['', '', '', '']);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  const fetchTeams = async () => {
+    try {
+      const res = await fetch('/api/teams', { cache: 'no-store' });
+      const data = await res.json();
+      setTeams(data);
+    } catch (error) {
+      console.error('チーム一覧取得エラー', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   const handlePlayerNameChange = (index: number, value: string) => {
     const newNames = [...playerNames];
@@ -43,6 +65,7 @@ export default function TeamRegistrationPage() {
         setTeamName('');
         setTeamColor('');
         setPlayerNames(['', '', '', '']);
+        fetchTeams();
       }
     } catch (err) {
       setMessage({ type: 'error', text: '通信エラーが発生しました' });
@@ -141,6 +164,40 @@ export default function TeamRegistrationPage() {
               {isLoading ? "SAVING..." : "チームと選手を登録する"}
             </button>
           </form>
+        </div>
+
+        <div className="mt-10 bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
+          <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+            <h2 className="text-sm font-bold text-yellow-500 tracking-widest uppercase">Registered Teams</h2>
+            <Link href="/Admin/Teams/Edit" className="text-xs text-gray-400 hover:text-yellow-500 transition-colors tracking-widest uppercase">
+              一覧編集ページへ
+            </Link>
+          </div>
+
+          {teams.length === 0 ? (
+            <p className="text-sm text-gray-500">登録済みチームはまだありません。</p>
+          ) : (
+            <div className="space-y-3">
+              {teams.map((team) => (
+                <div key={team.id} className="flex items-center justify-between bg-black/40 border border-white/10 p-3 rounded-sm">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: team.color || '#eab308' }}></span>
+                      <p className="font-bold text-white truncate">{team.name}</p>
+                    </div>
+                    <p className="text-[10px] text-gray-500 tracking-widest uppercase mt-1">{team.players.length} players</p>
+                  </div>
+                  <Link
+                    href={`/Admin/Teams/Edit?teamId=${team.id}`}
+                    className="text-xs px-3 py-2 border border-yellow-500/40 text-yellow-500 hover:bg-yellow-500 hover:text-black transition-colors tracking-widest uppercase"
+                  >
+                    編集
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </main>

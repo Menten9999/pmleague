@@ -8,10 +8,10 @@ export default async function ScoresLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const role = (session?.user as any)?.role;
 
-  // 🌟【最重要セキュリティ】
-  // ADMIN（サイト管理者）以外がアクセスしようとしたら、問答無用でトップページに弾く
-  if (!session?.user || (session.user as any).role !== "ADMIN") {
+  // ADMIN と MANAGER のみアクセスを許可する
+  if (!session?.user || (role !== "ADMIN" && role !== "MANAGER")) {
     redirect("/");
   }
 

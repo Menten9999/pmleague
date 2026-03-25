@@ -29,7 +29,7 @@ export default function LoginPage() {
         setError("IDまたはパスワードが正しくありません");
       } else {
         // ログイン成功時
-        router.push("/");
+        router.push("/Admin");
         router.refresh();
       }
     } catch (err) {

@@ -49,7 +49,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* ヘッダー・ロゴ */}
         <div className="text-center mb-10">
-          <Link href="./Admin/Scores" className="text-4xl font-black italic tracking-tighter text-yellow-500">
+          <Link href="/" className="text-4xl font-black italic tracking-tighter text-gold-gradient no-underline">
             PM LEAGUE
           </Link>
           <p className="text-gray-500 text-xs mt-2 tracking-[0.3em] uppercase font-bold">

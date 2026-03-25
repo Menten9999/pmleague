@@ -117,19 +117,19 @@ export default function ScoreInputPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans flex flex-col items-center">
-      <div className="w-full max-w-4xl mt-10">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans flex flex-col items-center">
+      <div className="w-full max-w-4xl mt-8 md:mt-10">
         
-        <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 border-b border-white/10 pb-4">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-yellow-500">
+            <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-yellow-500">
               SCORE REGISTRATION
             </h1>
-            <p className="text-gray-500 text-xs mt-1 tracking-[0.2em] uppercase font-bold">
+            <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
               試合結果入力
             </p>
           </div>
-          <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors">
+          <Link href="/" className="text-xs md:text-sm text-gray-400 hover:text-yellow-500 transition-colors">
             トップへ戻る
           </Link>
         </div>
@@ -140,10 +140,10 @@ export default function ScoreInputPage() {
           </div>
         )}
 
-        <div className="bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative">
+        <div className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">試合名（任意）</label>
             <input
               type="text"
@@ -220,13 +220,13 @@ export default function ScoreInputPage() {
             <button
               type="button"
               onClick={calculatePoints}
-              className="bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-3 px-6 rounded-sm transition-colors border border-white/10"
+              className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-3 px-6 rounded-sm transition-colors border border-white/10"
             >
               ポイントを自動計算する
             </button>
           </div>
 
-          <div className="mt-6 flex justify-between items-center bg-black p-4 border border-white/10 rounded-sm">
+          <div className="mt-6 flex flex-col sm:flex-row gap-2 sm:gap-4 sm:justify-between sm:items-center bg-black p-4 border border-white/10 rounded-sm">
             <div className="text-sm font-bold text-gray-400 tracking-widest uppercase">
               Total Points Check
             </div>

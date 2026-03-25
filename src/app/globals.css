@@ -6,6 +6,7 @@
   body {
     background-color: #050505;
     color: #ffffff;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -91,4 +92,20 @@
   align-items: center !important;
   justify-content: flex-end !important;
   flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .m-ranking-row {
+    gap: 0.5rem;
+  }
+
+  .m-ranking-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .m-ranking-right {
+    gap: 0.75rem;
+    flex-shrink: 1;
+  }
 }

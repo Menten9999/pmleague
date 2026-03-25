@@ -42,15 +42,15 @@ export default async function MatchesPage() {
   const nextMatch = scheduledMatches[0];
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans">
-      <div className="max-w-5xl mx-auto mt-10">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans">
+      <div className="max-w-5xl mx-auto mt-8 md:mt-10">
         
         {/* ヘッダー */}
-        <div className="text-center mb-16 border-b border-white/10 pb-6">
-          <h1 className="text-5xl font-black italic tracking-tighter text-yellow-500">
+        <div className="text-center mb-10 md:mb-16 border-b border-white/10 pb-5 md:pb-6">
+          <h1 className="text-4xl sm:text-5xl font-black italic tracking-tighter text-yellow-500">
             MATCHES
           </h1>
-          <p className="text-gray-500 text-sm mt-2 tracking-[0.3em] uppercase font-bold">
+          <p className="text-gray-500 text-xs md:text-sm mt-2 tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold">
             試合日程・結果
           </p>
         </div>
@@ -58,8 +58,8 @@ export default async function MatchesPage() {
 {/* =========================================
             次回予告（NEXT MATCH）セクション
             ========================================= */}
-        <section className="mb-20">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-6">
+        <section className="mb-14 md:mb-20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2 mb-6">
             <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">
               NEXT MATCH
             </h2>
@@ -67,7 +67,7 @@ export default async function MatchesPage() {
           </div>
 
           {nextMatch ? (
-            <div className="bg-[#111] border border-yellow-600/30 p-8 rounded-sm shadow-[0_0_30px_rgba(234,179,8,0.1)] relative overflow-hidden">
+            <div className="bg-[#111] border border-yellow-600/30 p-4 sm:p-8 rounded-sm shadow-[0_0_30px_rgba(234,179,8,0.1)] relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
               
               <div className="text-center mb-8">
@@ -82,7 +82,7 @@ export default async function MatchesPage() {
                   const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
 
                   return (
-                    <div key={res.id} className="bg-black border border-white/10 p-4 text-center rounded-sm relative overflow-hidden flex flex-col justify-center items-center h-32">
+                    <div key={res.id} className="bg-black border border-white/10 p-3 sm:p-4 text-center rounded-sm relative overflow-hidden flex flex-col justify-center items-center min-h-28 sm:h-32">
                       {/* チームカラーのライン */}
                       <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
                       
@@ -117,7 +117,7 @@ export default async function MatchesPage() {
             試合結果（MATCH HISTORY）セクション
             ========================================= */}
         <section>
-          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2 mb-6">
             <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">
               MATCH HISTORY
             </h2>
@@ -129,7 +129,7 @@ export default async function MatchesPage() {
               <div key={match.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden hover:border-white/30 transition-colors">
                 
                 {/* 試合タイトル帯 */}
-                <div className="bg-black/50 border-b border-white/10 px-6 py-3 flex justify-between items-center">
+                <div className="bg-black/50 border-b border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center">
                   <div className="font-bold tracking-widest text-yellow-500">{match.title}</div>
                 </div>
 
@@ -141,17 +141,17 @@ export default async function MatchesPage() {
                     const rankColor = rankColors[index] || "text-gray-500";
 
                     return (
-                      <div key={res.id} className="flex items-center justify-between bg-black/30 border border-white/5 p-3 rounded-sm relative overflow-hidden">
+                      <div key={res.id} className="flex items-center justify-between gap-3 bg-black/30 border border-white/5 p-3 rounded-sm relative overflow-hidden">
                         {/* チームカラーのサイドライン */}
                         <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: res.player.team?.color || '#333' }}></div>
                         
-                        <div className="flex items-center gap-4 pl-4 flex-grow">
+                        <div className="flex items-center gap-3 sm:gap-4 pl-4 flex-grow min-w-0">
                           <div className={`font-black italic text-xl ${rankColor} w-8`}>
                             {index + 1}
                           </div>
                           <div>
                             <div className="text-[10px] text-gray-500 tracking-widest uppercase">{res.player.team?.name}</div>
-                            <div className="font-bold text-white tracking-wider">{res.player.name}</div>
+                            <div className="font-bold text-white tracking-wider truncate">{res.player.name}</div>
                           </div>
                         </div>
 

@@ -23,19 +23,19 @@ export default async function UsersAdminPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans pt-32">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans pt-24 md:pt-32">
       <div className="max-w-4xl mx-auto">
         <div className="mb-10 border-b border-red-500/30 pb-4">
-          <h1 className="text-3xl font-black italic tracking-wider text-red-500">
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-wider text-red-500">
             SYSTEM <span className="text-white">ADMINISTRATION</span>
           </h1>
-          <p className="text-gray-500 text-xs mt-2 tracking-widest uppercase font-bold">
+          <p className="text-gray-500 text-[10px] md:text-xs mt-2 tracking-[0.12em] md:tracking-widest uppercase font-bold">
             サイト管理者専用：ユーザー管理ダッシュボード
           </p>
         </div>
 
-        <div className="bg-[#111] border border-white/10 rounded-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-[#111] border border-white/10 rounded-sm overflow-hidden overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left border-collapse">
             <thead>
               <tr className="bg-[#1a1a1a] border-b border-white/10 text-xs text-gray-400 tracking-widest uppercase">
                 <th className="p-4 font-bold">Role</th>

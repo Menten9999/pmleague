@@ -117,19 +117,19 @@ export default function SchedulePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans flex flex-col items-center">
-      <div className="w-full max-w-3xl mt-10">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans flex flex-col items-center">
+      <div className="w-full max-w-3xl mt-8 md:mt-10">
         
-        <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 border-b border-white/10 pb-4">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-yellow-500">
+            <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-yellow-500">
               NEXT MATCH SETUP
             </h1>
-            <p className="text-gray-500 text-xs mt-1 tracking-[0.2em] uppercase font-bold">
+            <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
               次回対戦カード（予告）登録 / 同時2試合対応
             </p>
           </div>
-          <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors">
+          <Link href="/" className="text-xs md:text-sm text-gray-400 hover:text-yellow-500 transition-colors">
             トップへ戻る
           </Link>
         </div>
@@ -140,12 +140,12 @@ export default function SchedulePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative">
+        <form onSubmit={handleSubmit} className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-          <div className="mb-8 p-4 bg-black/40 border border-white/10 rounded-sm">
+          <div className="mb-6 sm:mb-8 p-4 bg-black/40 border border-white/10 rounded-sm">
             <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">登録モード</label>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
               <label className="flex items-center gap-2 text-sm text-gray-300">
                 <input
                   type="radio"

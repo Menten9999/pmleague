@@ -75,20 +75,20 @@ export default function TeamRegistrationPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans flex flex-col items-center">
-      <div className="w-full max-w-2xl mt-10">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans flex flex-col items-center">
+      <div className="w-full max-w-2xl mt-8 md:mt-10">
         
         {/* ヘッダー部分 */}
-        <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 border-b border-white/10 pb-4">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-yellow-500">
+            <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-yellow-500">
               TEAM REGISTRATION
             </h1>
-            <p className="text-gray-500 text-xs mt-1 tracking-[0.2em] uppercase font-bold">
+            <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
               チームおよび所属選手登録
             </p>
           </div>
-          <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors">
+          <Link href="/" className="text-xs md:text-sm text-gray-400 hover:text-yellow-500 transition-colors">
             トップへ戻る
           </Link>
         </div>
@@ -101,10 +101,10 @@ export default function TeamRegistrationPage() {
         )}
 
         {/* 登録フォーム */}
-        <div className="bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative overflow-hidden">
+        <div className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             
             {/* チーム情報セクション */}
             <div className="space-y-4">
@@ -166,7 +166,7 @@ export default function TeamRegistrationPage() {
           </form>
         </div>
 
-        <div className="mt-10 bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative overflow-hidden">
+        <div className="mt-8 md:mt-10 bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
           <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
             <h2 className="text-sm font-bold text-yellow-500 tracking-widest uppercase">Registered Teams</h2>

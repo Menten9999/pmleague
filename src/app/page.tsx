@@ -44,18 +44,18 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden">
       
-      <section className={`${styles.mStripeBg} relative w-full h-[80vh] flex flex-col items-center justify-center border-b border-yellow-600/30 overflow-hidden`}>
+      <section className={`${styles.mStripeBg} relative w-full min-h-[70svh] md:h-[80vh] flex flex-col items-center justify-center border-b border-yellow-600/30 overflow-hidden px-4`}>
         <div className="absolute inset-0 bg-[url('https://placehold.co/1920x1080/111111/333333?text=KEY+VISUAL+IMAGE')] bg-cover bg-center bg-no-repeat opacity-20 mix-blend-luminosity scale-105 animate-[pulse_10s_ease-in-out_infinite_alternate]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-black/80"></div>
         
         <div className={`${styles.fadeInUp} relative z-10 text-center flex flex-col items-center`}>
           <div className="w-1 h-24 bg-gradient-to-b from-yellow-300 to-yellow-700 transform rotate-45 mb-6"></div>
           
-          <h1 className="text-6xl md:text-9xl font-black italic tracking-tighter drop-shadow-2xl">
+          <h1 className="text-5xl sm:text-6xl md:text-9xl font-black italic tracking-tighter drop-shadow-2xl leading-none">
             <span className="text-white">PM </span>
             <span className={styles.textGoldGradient}>LEAGUE</span>
           </h1>
-          <p className="mt-6 text-yellow-500 tracking-[0.5em] text-sm md:text-lg font-bold">
+          <p className="mt-4 md:mt-6 text-yellow-500 tracking-[0.3em] md:tracking-[0.5em] text-[11px] md:text-lg font-bold text-center">
             THE PREMIER MAHJONG STAGE
           </p>
         </div>
@@ -75,7 +75,7 @@ export default async function Home() {
             <div className="w-full max-w-5xl space-y-6">
               {nextMatches.map((nextMatch, matchIndex) => (
                 <div key={nextMatch.id} className={`${styles.glowPanel} p-1 md:p-2 relative group`}>
-                  <div className="bg-[#0a0a0a] p-8 md:p-12">
+                  <div className="bg-[#0a0a0a] p-5 sm:p-8 md:p-12">
                     <div className="text-center mb-10">
                       <div className="text-[10px] text-gray-500 tracking-[0.3em] uppercase mb-3">
                         Match {matchIndex + 1}
@@ -91,7 +91,7 @@ export default async function Home() {
                         const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
 
                         return (
-                          <div key={res.id} className="relative bg-[#111] p-6 text-center border border-white/5 hover:border-white/20 hover:bg-[#151515] transition-all flex flex-col items-center justify-center min-h-[200px]">
+                          <div key={res.id} className="relative bg-[#111] p-4 md:p-6 text-center border border-white/5 hover:border-white/20 hover:bg-[#151515] transition-all flex flex-col items-center justify-center min-h-[160px] md:min-h-[200px]">
                             <div className="absolute inset-0 bg-[url('https://placehold.co/400x600/222222/444444?text=PLAYER')] bg-cover bg-center opacity-10 mix-blend-luminosity"></div>
                             <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
 

@@ -46,18 +46,18 @@ export default function ArchiveAdminPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans flex flex-col items-center">
-      <div className="w-full max-w-2xl mt-10">
-        <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans flex flex-col items-center">
+      <div className="w-full max-w-2xl mt-8 md:mt-10">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-8 border-b border-white/10 pb-4">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-red-500">
+            <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-red-500">
               SEASON ARCHIVE
             </h1>
-            <p className="text-gray-500 text-xs mt-1 tracking-[0.2em] uppercase font-bold">
+            <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
               シーズン終了と成績の保存（危険操作）
             </p>
           </div>
-          <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors">
+          <Link href="/" className="text-xs md:text-sm text-gray-400 hover:text-yellow-500 transition-colors">
             トップへ戻る
           </Link>
         </div>
@@ -68,10 +68,10 @@ export default function ArchiveAdminPage() {
           </div>
         )}
 
-        <form onSubmit={handleArchive} className="bg-[#111] border border-red-900/50 p-8 rounded-sm shadow-2xl relative">
+        <form onSubmit={handleArchive} className="bg-[#111] border border-red-900/50 p-5 sm:p-8 rounded-sm shadow-2xl relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-900 via-red-500 to-red-900"></div>
 
-          <div className="bg-red-950/30 border border-red-900/50 p-4 mb-8 rounded-sm text-sm text-red-200 leading-relaxed">
+          <div className="bg-red-950/30 border border-red-900/50 p-4 mb-6 sm:mb-8 rounded-sm text-sm text-red-200 leading-relaxed">
             <span className="font-bold text-red-500">⚠️ 警告：</span><br />
             この操作を実行すると、現在の「全チーム・全選手のスコア」と「試合結果」がすべてリセットされ、新シーズンに向けた初期状態（0pt）に戻ります。現在の成績は「過去のシーズン」として永久保存されます。
           </div>

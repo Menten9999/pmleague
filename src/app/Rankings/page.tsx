@@ -18,18 +18,18 @@ export default async function RankingsPage() {
   const topPlayerScore = players[0]?.totalScore ?? 0;
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 text-white font-sans">
-      <div className="max-w-6xl mx-auto mt-10">
+    <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans">
+      <div className="max-w-6xl mx-auto mt-8 md:mt-10">
         
-        <div className="text-center mb-16 border-b border-white/10 pb-6">
-          <h1 className="text-5xl font-black italic tracking-tighter text-yellow-500">RANKINGS</h1>
-          <p className="text-gray-500 text-sm mt-2 tracking-[0.3em] uppercase font-bold">PMリーグ 最新ランキング</p>
+        <div className="text-center mb-10 md:mb-16 border-b border-white/10 pb-5 md:pb-6">
+          <h1 className="text-4xl sm:text-5xl font-black italic tracking-tighter text-yellow-500">RANKINGS</h1>
+          <p className="text-gray-500 text-xs md:text-sm mt-2 tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold">PMリーグ 最新ランキング</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           
           <section>
-            <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2">
               <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">TEAM RANKING</h2>
               <span className="text-[10px] text-gray-500 tracking-widest uppercase">チーム成績</span>
             </div>
@@ -68,7 +68,7 @@ export default async function RankingsPage() {
           </section>
 
           <section>
-            <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2">
               <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">PLAYER RANKING</h2>
               <span className="text-[10px] text-gray-500 tracking-widest uppercase">個人成績</span>
             </div>

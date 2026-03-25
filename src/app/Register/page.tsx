@@ -41,21 +41,21 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] flex items-center justify-center p-6 text-white font-sans pt-20">
+    <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4 sm:p-6 text-white font-sans pt-20">
       <div className="fixed inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none">
         <span className="text-[20vw] font-black italic">PM</span>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-black italic tracking-tighter text-yellow-500">MANAGER REGISTRATION</h1>
-          <p className="text-gray-500 text-xs mt-2 tracking-[0.3em] uppercase font-bold">新規チーム＆監督アカウント登録</p>
+        <div className="text-center mb-8 md:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-yellow-500">MANAGER REGISTRATION</h1>
+          <p className="text-[10px] md:text-xs text-gray-500 mt-2 tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold">新規チーム＆監督アカウント登録</p>
         </div>
 
-        <div className="bg-[#111] border border-white/10 p-8 rounded-sm shadow-2xl relative overflow-hidden">
+        <div className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {error && <div className="bg-red-900/50 border border-red-500 text-red-200 text-sm p-3 rounded-sm text-center font-bold tracking-widest">{error}</div>}
 
             <div className="space-y-2">

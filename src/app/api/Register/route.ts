@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -7,16 +7,25 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     // 🌟 画面から teamName（チーム名） も受け取るように追加
-    const { userId, name, password, inviteCode, teamName } = await req.json();
+    const body = await req.json();
+    const userId = String(body.userId ?? "").trim();
+    const name = String(body.name ?? "").trim();
+    const password = String(body.password ?? "");
+    const inviteCode = String(body.inviteCode ?? "").trim();
+    const teamName = String(body.teamName ?? "").trim();
 
     const validInviteCode = process.env.INVITE_CODE || "pmleague2026";
+
+    if (!userId || !name || !password || !inviteCode || !teamName) {
+      return NextResponse.json({ error: "入力項目が不足しています" }, { status: 400 });
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json({ error: "パスワードは8文字以上で入力してください" }, { status: 400 });
+    }
     
     if (inviteCode !== validInviteCode) {
       return NextResponse.json({ error: "招待コードが間違っています" }, { status: 403 });
-    }
-
-    if (!teamName) {
-      return NextResponse.json({ error: "チーム名は必須です" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { userId } });
@@ -52,6 +61,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "チームと監督の登録が完了しました！" }, { status: 201 });
   } catch (error) {
     console.error(error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        const target = Array.isArray(error.meta?.target)
+          ? (error.meta?.target as string[])
+          : [];
+
+        if (target.includes("name")) {
+          return NextResponse.json({ error: "そのチーム名は既に使われています" }, { status: 400 });
+        }
+
+        if (target.includes("userId")) {
+          return NextResponse.json({ error: "このログインIDは既に使われています" }, { status: 400 });
+        }
+
+        return NextResponse.json({ error: "重複データがあるため登録できません" }, { status: 400 });
+      }
+    }
+
     return NextResponse.json({ error: "登録中にエラーが発生しました" }, { status: 500 });
   }
 }

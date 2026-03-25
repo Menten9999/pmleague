@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
+// 🌟 これがビルドエラーを防ぐ最強の魔法です（必ずimportの直後に書きます）
 export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
@@ -19,20 +20,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "このチーム名は既に登録されています" }, { status: 400 });
     }
 
-    // チームと選手をまとめてデータベースに保存（Prismaの強力な機能）
+    // チームと選手をまとめてデータベースに保存
     const team = await prisma.team.create({
       data: {
         name,
         color,
         players: {
-          // 入力された選手名リストから、空欄のものを除外して登録
           create: playerNames
             .filter((pName: string) => pName.trim() !== "")
             .map((pName: string) => ({ name: pName })),
         },
       },
       include: {
-        players: true, // 保存した結果に選手情報も含めて返す
+        players: true,
       },
     });
 
@@ -42,7 +42,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "登録中にエラーが発生しました" }, { status: 500 });
   }
 }
-// --- 以下のコードを一番下に追記してください ---
 
 export async function GET() {
   try {
@@ -61,9 +60,7 @@ export async function GET() {
     return NextResponse.json({ error: "チーム情報の取得に失敗しました" }, { status: 500 });
   }
 }
-// --- 以下のコードを一番下に追記してください ---
 
-// チーム情報と選手情報を更新（書き換え）する処理
 export async function PATCH(req: Request) {
   try {
     const { id, name, color, players } = await req.json();
@@ -81,8 +78,6 @@ export async function PATCH(req: Request) {
     // 2. 所属選手の更新または新規追加
     for (const p of players) {
       if (p.id) {
-        // すでに登録されている選手の場合：名前を更新
-        // （※過去のスコアデータが消えてしまうのを防ぐため、空欄の場合は更新しない安全設計です）
         if (p.name.trim() !== "") {
           await prisma.player.update({
             where: { id: p.id },
@@ -90,7 +85,6 @@ export async function PATCH(req: Request) {
           });
         }
       } else if (!p.id && p.name.trim() !== "") {
-        // まだ登録されていない（IDがない）新しい選手が入力された場合：新メンバーとして追加
         await prisma.player.create({
           data: {
             name: p.name,

@@ -20,13 +20,14 @@ type NextMatchWithResults = Prisma.MatchGetPayload<{
 }>;
 
 export default async function Home() {
-  let nextMatch: NextMatchWithResults | null = null;
+  let nextMatches: NextMatchWithResults[] = [];
   let topTeams: Awaited<ReturnType<typeof prisma.team.findMany>> = [];
 
   try {
-    nextMatch = await prisma.match.findFirst({
+    nextMatches = await prisma.match.findMany({
       where: { status: "SCHEDULED" },
-      orderBy: { id: "asc" },
+      orderBy: [{ date: "asc" }, { id: "asc" }],
+      take: 2,
       include: {
         results: { include: { player: { include: { team: true } } } },
       },
@@ -70,35 +71,42 @@ export default async function Home() {
             <span className="text-xs text-yellow-600 tracking-[0.3em] uppercase mt-2 block">次回対戦カード</span>
           </div>
 
-          {nextMatch ? (
-            <div className={`${styles.glowPanel} p-1 md:p-2 relative group max-w-5xl`}>
-              <div className="bg-[#0a0a0a] p-8 md:p-12">
-                <div className="text-center mb-10">
-                  <div className="inline-block bg-yellow-500 text-black font-bold tracking-widest px-8 py-2 text-xl transform -skew-x-12">
-                    <span className="block transform skew-x-12">{nextMatch.title}</span>
+          {nextMatches.length > 0 ? (
+            <div className="w-full max-w-5xl space-y-6">
+              {nextMatches.map((nextMatch, matchIndex) => (
+                <div key={nextMatch.id} className={`${styles.glowPanel} p-1 md:p-2 relative group`}>
+                  <div className="bg-[#0a0a0a] p-8 md:p-12">
+                    <div className="text-center mb-10">
+                      <div className="text-[10px] text-gray-500 tracking-[0.3em] uppercase mb-3">
+                        Match {matchIndex + 1}
+                      </div>
+                      <div className="inline-block bg-yellow-500 text-black font-bold tracking-widest px-8 py-2 text-xl transform -skew-x-12">
+                        <span className="block transform skew-x-12">{nextMatch.title}</span>
+                      </div>
+                    </div>
+
+                    <div className={styles.matchGrid}>
+                      {[...nextMatch.results].sort((a, b) => String(a.id).localeCompare(String(b.id))).map((res, i) => {
+                        const winds = ["東", "南", "西", "北"];
+                        const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
+
+                        return (
+                          <div key={res.id} className="relative bg-[#111] p-6 text-center border border-white/5 hover:border-white/20 hover:bg-[#151515] transition-all flex flex-col items-center justify-center min-h-[200px]">
+                            <div className="absolute inset-0 bg-[url('https://placehold.co/400x600/222222/444444?text=PLAYER')] bg-cover bg-center opacity-10 mix-blend-luminosity"></div>
+                            <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
+
+                            <div className="z-10 relative mt-auto">
+                              <div className={`text-xl font-black italic ${windColors[i]} mb-2`}>{winds[i]}家</div>
+                              <div className="text-xs text-gray-400 tracking-widest uppercase mb-1">{res.player.team?.name}</div>
+                              <div className="text-2xl font-bold text-white tracking-wider">{res.player.name}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-
-                <div className={styles.matchGrid}>
-                  {[...nextMatch.results].sort((a, b) => String(a.id).localeCompare(String(b.id))).map((res, i) => {
-                    const winds = ["東", "南", "西", "北"];
-                    const windColors = ["text-red-500", "text-blue-500", "text-green-500", "text-gray-400"];
-
-                    return (
-                      <div key={res.id} className="relative bg-[#111] p-6 text-center border border-white/5 hover:border-white/20 hover:bg-[#151515] transition-all flex flex-col items-center justify-center min-h-[200px]">
-                        <div className="absolute inset-0 bg-[url('https://placehold.co/400x600/222222/444444?text=PLAYER')] bg-cover bg-center opacity-10 mix-blend-luminosity"></div>
-                        <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
-                        
-                        <div className="z-10 relative mt-auto">
-                          <div className={`text-xl font-black italic ${windColors[i]} mb-2`}>{winds[i]}家</div>
-                          <div className="text-xs text-gray-400 tracking-widest uppercase mb-1">{res.player.team?.name}</div>
-                          <div className="text-2xl font-bold text-white tracking-wider">{res.player.name}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              ))}
             </div>
           ) : (
             <div className={`${styles.glowPanel} p-16 text-center max-w-3xl`}>

@@ -1,26 +1,44 @@
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
-import { auth } from "@/auth";
+import { Prisma, PrismaClient } from "@prisma/client";
 import styles from "./page.module.css";
 
 const prisma = new PrismaClient();
 export const revalidate = 0;
 
+type NextMatchWithResults = Prisma.MatchGetPayload<{
+  include: {
+    results: {
+      include: {
+        player: {
+          include: {
+            team: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
 export default async function Home() {
-  const session = await auth();
+  let nextMatch: NextMatchWithResults | null = null;
+  let topTeams: Awaited<ReturnType<typeof prisma.team.findMany>> = [];
 
-  const nextMatch = await prisma.match.findFirst({
-    where: { status: "SCHEDULED" },
-    orderBy: { id: "asc" },
-    include: {
-      results: { include: { player: { include: { team: true } } } },
-    },
-  });
+  try {
+    nextMatch = await prisma.match.findFirst({
+      where: { status: "SCHEDULED" },
+      orderBy: { id: "asc" },
+      include: {
+        results: { include: { player: { include: { team: true } } } },
+      },
+    });
 
-  const topTeams = await prisma.team.findMany({
-    orderBy: { totalScore: "desc" },
-    take: 4,
-  });
+    topTeams = await prisma.team.findMany({
+      orderBy: { totalScore: "desc" },
+      take: 4,
+    });
+  } catch (error) {
+    console.error("[home] Failed to load match/team data", error);
+  }
 
   return (
     <main className="min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden">

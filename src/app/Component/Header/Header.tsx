@@ -2,10 +2,26 @@ import Link from "next/link";
 import Image from "next/image";
 // 🌟 修正ポイント1： auth と一緒に signOut もインポートする
 import { auth, signOut } from "@/auth";
+import type { Session } from "next-auth";
 import styles from "./Header.module.css";
 
 export default async function Header() {
-  const session = await auth();
+  let session: Session | null = null;
+
+  try {
+    session = await auth();
+  } catch (error) {
+    // Fallback to logged-out UI when auth config/env is missing in production.
+    const isExpectedDynamicError =
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      (error as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE";
+
+    if (!isExpectedDynamicError) {
+      console.error("[header] Failed to resolve session", error);
+    }
+  }
 
   return (
     <header className={styles.headerContainer}>

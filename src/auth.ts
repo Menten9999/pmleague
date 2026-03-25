@@ -4,8 +4,19 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  "pmleague-temporary-secret-change-me";
+
+if (!process.env.AUTH_SECRET && !process.env.NEXTAUTH_SECRET) {
+  console.warn(
+    "[auth] AUTH_SECRET is not set. Using temporary fallback secret. Configure AUTH_SECRET in Vercel."
+  );
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: authSecret,
   providers: [
     CredentialsProvider({
       name: "Credentials",

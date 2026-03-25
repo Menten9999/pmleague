@@ -29,11 +29,45 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!isPasswordValid) return null;
 
-        return { id: user.id, name: user.name };
+        // 🌟 修正1：デフォルトの id, name に加えて、必要な全情報を返す
+        return {
+          id: user.id,
+          name: user.name,
+          userId: user.userId, // カスタムフィールド
+          role: user.role,     // カスタムフィールド
+          teamId: user.teamId, // カスタムフィールド
+        };
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {
+    // 🌟 修正2：authorizeで返したデータを受け取り、JWTトークンに焼き付ける
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.userId = (user as any).userId;
+        token.role = (user as any).role;
+        token.teamId = (user as any).teamId;
+      }
+      return token;
+    },
+    // 🌟 修正3：JWTトークンのデータを、画面側で使える session オブジェクトに渡す
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        (session.user as any).userId = token.userId;
+        (session.user as any).role = token.role;
+        (session.user as any).teamId = token.teamId;
+      }
+      return session;
+    },
+  },
   pages: {
     signIn: "/Login",
   },
+  // 🌟 Vercel以外（ローカル開発など）で動かす際のエラーを防ぐおまじない
+  trustHost: true, 
 });

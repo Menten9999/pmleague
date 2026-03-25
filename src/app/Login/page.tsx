@@ -17,18 +17,18 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    try {
-      // Auth.ts で設定した credentials 認証を呼び出す
+ try {
       const result = await signIn("credentials", {
         userId: userId,
         password: password,
-        redirect: false, // 自分でエラーハンドリングするため
+        redirect: false,
       });
 
-      if (result?.error) {
+      // 🌟 ここを少しだけ変更（result.ok が false の場合もエラー扱いにする）
+      if (!result?.ok || result?.error) {
         setError("IDまたはパスワードが正しくありません");
       } else {
-        // ログイン成功時、トップまたはダッシュボードへ
+        // ログイン成功時
         router.push("/");
         router.refresh();
       }
@@ -101,6 +101,13 @@ export default function LoginPage() {
               {isLoading ? "AUTHENTICATING..." : "LOGIN"}
             </button>
           </form>
+          {/* ----- ログイン画面の </form> の直下に追加 ----- */}
+          <div className="mt-6 text-center border-t border-white/10 pt-6">
+             <p className="text-[10px] text-gray-500 tracking-widest mb-2">関係者（監督）の方はこちら</p>
+             <Link href="/Register" className="text-xs text-yellow-600 hover:text-yellow-400 transition-colors tracking-widest uppercase font-bold">
+               ▶ 新規アカウント登録 (要 招待コード)
+             </Link>
+          </div>
         </div>
 
         {/* フッターリンク */}

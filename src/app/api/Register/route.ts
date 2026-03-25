@@ -33,6 +33,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "このログインIDは既に使われています" }, { status: 400 });
     }
 
+    const existingTeam = await prisma.team.findUnique({ where: { name: teamName } });
+    if (existingTeam) {
+      return NextResponse.json({ error: "そのチーム名は既に使われています" }, { status: 400 });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 🌟 トランザクション（チーム作成とユーザー作成を同時に、失敗したら両方取り消す安全な処理）
@@ -61,6 +66,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "チームと監督の登録が完了しました！" }, { status: 201 });
   } catch (error) {
     console.error(error);
+
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+      return NextResponse.json(
+        {
+          error:
+            "データベースに接続できません。Vercelの環境変数（DATABASE_URL / DIRECT_URL）を確認してください",
+        },
+        { status: 500 }
+      );
+    }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

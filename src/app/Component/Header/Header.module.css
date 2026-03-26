@@ -33,6 +33,14 @@
   transition: all 0.3s ease;
 }
 
+.logoSubText {
+  display: inline;
+}
+
+.logoBadge {
+  flex-shrink: 0;
+}
+
 .logoGroup:hover .logoText {
   background: linear-gradient(to right, #b48530 0%, #eab308 25%, #fef08a 50%, #eab308 75%, #b48530 100%);
   -webkit-background-clip: text;
@@ -188,4 +196,28 @@
   padding-left: 1.5rem;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0; /* 縮小防止 */
+}
+
+@media (max-width: 640px) {
+  .logoGroup {
+    gap: 0.5rem;
+  }
+
+  .logoBadge {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .logoText {
+    font-size: 0.875rem !important;
+    line-height: 1.1;
+  }
+
+  .logoSubText {
+    display: none;
+  }
+
+  .innerContainer {
+    padding: 0 0.75rem;
+  }
 }

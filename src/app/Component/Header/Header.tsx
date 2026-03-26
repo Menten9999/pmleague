@@ -31,7 +31,7 @@ export default async function Header() {
             左側：ロゴとトップページリンク
             ========================================= */}
         <Link href="/" className={styles.logoGroup}>
-          <div className="w-12 h-12 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500">
+          <div className={`${styles.logoBadge} w-12 h-12 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500`}>
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             
             <div className="transform skew-x-12 relative w-full h-full">
@@ -50,7 +50,7 @@ export default async function Header() {
             <span className={`text-lg md:text-xl font-black italic tracking-tighter ${styles.logoText}`}>
               PM LEAGUE
             </span>
-            <span className="text-[6px] md:text-[8px] text-yellow-600 tracking-widest uppercase font-bold mt-0.5">
+            <span className={`text-[6px] md:text-[8px] text-yellow-600 tracking-widest uppercase font-bold mt-0.5 ${styles.logoSubText}`}>
               Official Website
             </span>
           </div>

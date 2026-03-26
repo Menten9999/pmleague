@@ -31,7 +31,7 @@ export default async function Header() {
             左側：ロゴとトップページリンク
             ========================================= */}
         <Link href="/" className={styles.logoGroup}>
-          <div className={`${styles.logoBadge} w-12 h-12 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500`}>
+          <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500 shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             
             <div className="transform skew-x-12 relative w-full h-full">
@@ -46,11 +46,11 @@ export default async function Header() {
             </div>
           </div>
           
-          <div className="flex flex-col">
-            <span className={`text-lg md:text-xl font-black italic tracking-tighter ${styles.logoText}`}>
+          <div className="flex flex-col min-w-0">
+            <span className={`text-xs sm:text-sm md:text-xl leading-none font-black italic tracking-tight whitespace-nowrap ${styles.logoText}`}>
               PM LEAGUE
             </span>
-            <span className={`text-[6px] md:text-[8px] text-yellow-600 tracking-widest uppercase font-bold mt-0.5 ${styles.logoSubText}`}>
+            <span className="hidden sm:block text-[7px] md:text-[8px] text-yellow-600 tracking-widest uppercase font-bold mt-0.5 whitespace-nowrap">
               Official Website
             </span>
           </div>

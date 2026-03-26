@@ -30,7 +30,7 @@ export default async function Header() {
         {/* =========================================
             左側：ロゴとトップページリンク
             ========================================= */}
-        <Link href="/" className={styles.logoGroup}>
+        <Link href="/" className={`${styles.logoGroup} hidden sm:flex`}>
           <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500 shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             

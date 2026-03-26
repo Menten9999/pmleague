@@ -195,6 +195,10 @@
     gap: 0.375rem;
   }
 
+  .navWrapper {
+    margin-left: 0;
+  }
+
   .innerContainer {
     padding: 0 0.75rem;
   }

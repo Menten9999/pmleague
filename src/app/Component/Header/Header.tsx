@@ -81,7 +81,7 @@ export default async function Header() {
                 )}
                 
                 {/* 監督・管理者共通のスコア入力ボタン */}
-                <Link href="/Admin/Scores" className={styles.skewBtnAdmin}>
+                <Link href="/Admin" className={styles.skewBtnAdmin}>
                   <span>Admin</span>
                 </Link>
 

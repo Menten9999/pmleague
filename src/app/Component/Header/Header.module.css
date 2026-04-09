@@ -134,7 +134,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  height: 5rem; /* 80px */
+  min-height: 5rem; /* 80px */
   max-width: 80rem; /* max-w-7xl相当 */
   margin: 0 auto;
   padding: 0 1rem;
@@ -156,7 +156,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 100%;
+  min-height: 100%;
   margin-left: 1rem;
   overflow-x: auto; /* 横スクロール許可 */
   
@@ -184,22 +184,203 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 2.5rem;
+  min-height: 2.5rem;
   padding-left: 1.5rem;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0; /* 縮小防止 */
 }
 
+.mobileMenu {
+  display: none;
+  position: relative;
+  z-index: 95;
+}
+
+.mobileMenuToggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobileMenuSummary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 209, 0, 0.45);
+  color: #f4c400;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.75rem;
+  background: rgba(244, 196, 0, 0.08);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mobileMenuPanel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  width: min(92vw, 340px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 10, 0.98);
+  backdrop-filter: blur(12px);
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  z-index: 90;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.mobileMenuOverlay {
+  display: none;
+}
+
+.mobileMenuToggle:checked + .mobileMenuSummary {
+  background: rgba(244, 196, 0, 0.2);
+  border-color: rgba(255, 209, 0, 0.7);
+}
+
+.mobileMenuToggle:checked + .mobileMenuSummary + .mobileMenuOverlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 85;
+}
+
+.mobileMenuToggle:checked + .mobileMenuSummary + .mobileMenuOverlay + .mobileMenuPanel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mobileLinkList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.mobileLink {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.52rem 0.4rem;
+}
+
+.mobileLink:hover {
+  border-color: rgba(244, 196, 0, 0.55);
+  color: #f4c400;
+}
+
+.mobileAuthArea {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mobileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: 1px solid;
+  padding: 0.58rem 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.mobileBtnAdmin {
+  border-color: rgba(244, 196, 0, 0.7);
+  color: #f4c400;
+  background: rgba(244, 196, 0, 0.1);
+}
+
+.mobileBtnAdmin:hover {
+  background: rgba(244, 196, 0, 0.2);
+}
+
+.mobileBtnSystem {
+  border-color: rgba(239, 68, 68, 0.75);
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.mobileBtnSystem:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.mobileBtnLogout,
+.mobileBtnLogin {
+  border-color: rgba(156, 163, 175, 0.65);
+  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mobileBtnLogout:hover,
+.mobileBtnLogin:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+}
+
 @media (max-width: 640px) {
+  .innerContainer {
+    min-height: 4.5rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
   .logoGroup {
     gap: 0.375rem;
   }
 
-  .navWrapper {
-    margin-left: 0;
-  }
-
   .innerContainer {
     padding: 0 0.75rem;
+  }
+
+  .navWrapper {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: block;
+    margin-left: auto;
+  }
+
+  .navLinks {
+    gap: 0.75rem;
+    margin-right: 0.75rem;
+  }
+
+  .navLink {
+    height: 2.2rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .authSection {
+    border-left: 0;
+    padding-left: 0;
+    min-height: 2.2rem;
+  }
+
+  .skewBtnAdmin,
+  .skewBtnLogin {
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    padding: 0.45rem 0.7rem;
   }
 }

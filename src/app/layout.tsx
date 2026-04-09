@@ -23,7 +23,7 @@ export default function RootLayout({
         <Header />
 
         {/* ヘッダーが固定される分、メインコンテンツを下げる */}
-        <div className="pt-20">
+        <div className="pt-24 sm:pt-20">
           {children}
         </div>
 

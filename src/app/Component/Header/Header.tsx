@@ -23,6 +23,15 @@ export default async function Header() {
     }
   }
 
+  const mainLinks = [
+    { href: "/Teams", label: "Teams" },
+    { href: "/Matches", label: "Matches" },
+    { href: "/Rankings", label: "Rankings" },
+    { href: "/Archive", label: "Archive" },
+  ];
+
+  const isSystemAdmin = (session?.user as any)?.role === "ADMIN";
+
   return (
     <header className={styles.headerContainer}>
       <div className={styles.innerContainer}>
@@ -30,7 +39,7 @@ export default async function Header() {
         {/* =========================================
             左側：ロゴとトップページリンク
             ========================================= */}
-        <Link href="/" className={`${styles.logoGroup} hidden sm:flex`}>
+        <Link href="/" className={styles.logoGroup}>
           <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-[#0a0a0a] border border-white/10 flex items-center justify-center transform -skew-x-12 overflow-hidden relative transition-colors duration-300 group-hover:border-yellow-500 shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             
@@ -62,10 +71,11 @@ export default async function Header() {
         <nav className={styles.navWrapper}>
           
           <div className={styles.navLinks}>
-            <Link href="/Teams" className={styles.navLink}>Teams</Link>
-            <Link href="/Matches" className={styles.navLink}>Matches</Link>
-            <Link href="/Rankings" className={styles.navLink}>Rankings</Link>
-            <Link href="/Archive" className={styles.navLink}>Archive</Link>
+            {mainLinks.map((item) => (
+              <Link key={item.href} href={item.href} className={styles.navLink}>
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           <div className={styles.authSection}>
@@ -74,7 +84,7 @@ export default async function Header() {
               <div className="flex items-center gap-3">
                 
                 {/* サイト管理者（ADMIN）の時だけ表示されるボタン */}
-                {(session.user as any).role === "ADMIN" && (
+                {isSystemAdmin && (
                   <Link href="/Admin/Users" className={`${styles.skewBtnAdmin} !border-red-500 !text-red-500 hover:!bg-red-500 hover:!text-black`}>
                     <span>System</span>
                   </Link>
@@ -105,6 +115,51 @@ export default async function Header() {
             )}
           </div>
         </nav>
+
+        <div className={styles.mobileMenu}>
+          <input id="mobile-nav-toggle" type="checkbox" className={styles.mobileMenuToggle} />
+          <label htmlFor="mobile-nav-toggle" className={styles.mobileMenuSummary}>Menu</label>
+          <label htmlFor="mobile-nav-toggle" className={styles.mobileMenuOverlay} aria-hidden="true" />
+
+          <div className={styles.mobileMenuPanel}>
+            <div className={styles.mobileLinkList}>
+              {mainLinks.map((item) => (
+                <Link key={`mobile-${item.href}`} href={item.href} className={styles.mobileLink}>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className={styles.mobileAuthArea}>
+              {session?.user ? (
+                <>
+                  {isSystemAdmin && (
+                    <Link href="/Admin/Users" className={`${styles.mobileBtn} ${styles.mobileBtnSystem}`}>
+                      System
+                    </Link>
+                  )}
+
+                  <Link href="/Admin" className={`${styles.mobileBtn} ${styles.mobileBtnAdmin}`}>
+                    Admin
+                  </Link>
+
+                  <form action={async () => {
+                    "use server";
+                    await signOut({ redirectTo: "/" });
+                  }}>
+                    <button type="submit" className={`${styles.mobileBtn} ${styles.mobileBtnLogout}`}>
+                      Logout
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <Link href="/Login" className={`${styles.mobileBtn} ${styles.mobileBtnLogin}`}>
+                  Login
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );

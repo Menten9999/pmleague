@@ -17,8 +17,8 @@ const adminNavItems: AdminNavItem[] = [
   },
   {
     href: "/Admin/Schedule",
-    label: "Schedule",
-    description: "次回対局の予告登録",
+    label: "Schedule Register",
+    description: "次以降の試合日程を登録",
   },
   {
     href: "/Admin/Teams",

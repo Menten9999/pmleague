@@ -85,9 +85,14 @@ export default async function Header() {
                 
                 {/* サイト管理者（ADMIN）の時だけ表示されるボタン */}
                 {isSystemAdmin && (
-                  <Link href="/Admin/Users" className={`${styles.skewBtnAdmin} !border-red-500 !text-red-500 hover:!bg-red-500 hover:!text-black`}>
-                    <span>System</span>
-                  </Link>
+                  <>
+                    <Link href="/Admin/Schedule" className={styles.skewBtnAdmin}>
+                      <span>Schedule</span>
+                    </Link>
+                    <Link href="/Admin/Users" className={`${styles.skewBtnAdmin} !border-red-500 !text-red-500 hover:!bg-red-500 hover:!text-black`}>
+                      <span>System</span>
+                    </Link>
+                  </>
                 )}
                 
                 {/* 監督・管理者共通のスコア入力ボタン */}
@@ -134,9 +139,14 @@ export default async function Header() {
               {session?.user ? (
                 <>
                   {isSystemAdmin && (
-                    <Link href="/Admin/Users" className={`${styles.mobileBtn} ${styles.mobileBtnSystem}`}>
-                      System
-                    </Link>
+                    <>
+                      <Link href="/Admin/Schedule" className={`${styles.mobileBtn} ${styles.mobileBtnAdmin}`}>
+                        Schedule
+                      </Link>
+                      <Link href="/Admin/Users" className={`${styles.mobileBtn} ${styles.mobileBtnSystem}`}>
+                        System
+                      </Link>
+                    </>
                   )}
 
                   <Link href="/Admin" className={`${styles.mobileBtn} ${styles.mobileBtnAdmin}`}>

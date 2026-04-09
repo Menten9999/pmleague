@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
@@ -10,6 +11,19 @@ type MatchScheduleInput = {
 
 export async function POST(req: Request) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
+    }
+
+    const role = (session.user as any).role as "ADMIN" | "MANAGER" | undefined;
+    const teamId = (session.user as any).teamId as string | null | undefined;
+
+    if (role !== "ADMIN" && role !== "MANAGER") {
+      return NextResponse.json({ error: "この操作を実行する権限がありません" }, { status: 403 });
+    }
+
     const body = await req.json();
 
     const matches: MatchScheduleInput[] = Array.isArray(body.matches)
@@ -32,6 +46,33 @@ export async function POST(req: Request) {
 
       if (new Set(playerIds).size !== 4) {
         return NextResponse.json({ error: "同一試合に同じ選手を重複登録できません" }, { status: 400 });
+      }
+    }
+
+    const allPlayerIds = matches.flatMap((match) => match.results.map((res) => res.playerId));
+
+    if (matches.length > 1 && new Set(allPlayerIds).size !== allPlayerIds.length) {
+      return NextResponse.json({ error: "2試合同時登録では同じ選手を重複指定できません" }, { status: 400 });
+    }
+
+    const uniquePlayerIds = Array.from(new Set(allPlayerIds));
+    const players = await prisma.player.findMany({
+      where: { id: { in: uniquePlayerIds } },
+      select: { id: true, teamId: true },
+    });
+
+    if (players.length !== uniquePlayerIds.length) {
+      return NextResponse.json({ error: "存在しない選手が指定されています" }, { status: 400 });
+    }
+
+    if (role === "MANAGER") {
+      if (!teamId) {
+        return NextResponse.json({ error: "監督アカウントに所属チームが設定されていません" }, { status: 400 });
+      }
+
+      const hasOtherTeamPlayer = players.some((player) => player.teamId !== teamId);
+      if (hasOtherTeamPlayer) {
+        return NextResponse.json({ error: "監督は自チームの選手のみ登録できます" }, { status: 403 });
       }
     }
 

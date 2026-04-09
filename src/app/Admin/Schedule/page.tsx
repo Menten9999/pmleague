@@ -5,6 +5,8 @@ import Link from 'next/link';
 
 type Player = { id: string; name: string };
 type Team = { id: string; name: string; players: Player[] };
+type UserRole = 'ADMIN' | 'MANAGER' | 'GUEST';
+type SessionUser = { role?: UserRole; teamId?: string | null };
 type MatchEntry = {
   title: string;
   results: { teamId: string; playerId: string }[];
@@ -19,6 +21,8 @@ const createEmptyResults = () => [
 
 export default function SchedulePage() {
   const [teams, setTeams] = useState<Team[]>([]);
+  const [userRole, setUserRole] = useState<UserRole>('GUEST');
+  const [userTeamId, setUserTeamId] = useState('');
   const [isDualMatch, setIsDualMatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -30,12 +34,56 @@ export default function SchedulePage() {
   ]);
 
   const winds = ["東家 (TON)", "南家 (NAN)", "西家 (XIA)", "北家 (PEI)"];
+  const isManagerScoped = userRole === 'MANAGER' && !!userTeamId;
 
   useEffect(() => {
-    fetch('/api/teams', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => setTeams(data))
-      .catch((err) => console.error("チーム取得エラー", err));
+    const loadInitialData = async () => {
+      try {
+        const [sessionRes, teamsRes] = await Promise.all([
+          fetch('/api/auth/session', { cache: 'no-store' }),
+          fetch('/api/teams', { cache: 'no-store' }),
+        ]);
+
+        const sessionData = await sessionRes.json();
+        const teamsData: Team[] = await teamsRes.json();
+        const sessionUser = (sessionData?.user || {}) as SessionUser;
+
+        const role = sessionUser.role || 'GUEST';
+        const teamId = sessionUser.teamId || '';
+
+        setUserRole(role);
+        setUserTeamId(teamId);
+
+        if (role === 'MANAGER' && teamId) {
+          const ownTeam = teamsData.find((team) => team.id === teamId);
+          if (!ownTeam) {
+            setMessage({ type: 'error', text: 'あなたの所属チーム情報を取得できませんでした。管理者に確認してください。' });
+            setTeams([]);
+            return;
+          }
+
+          setTeams([ownTeam]);
+
+          setMatches((prev) =>
+            prev.map((match) => ({
+              ...match,
+              results: match.results.map((result) => ({
+                teamId,
+                playerId: ownTeam.players.some((p) => p.id === result.playerId) ? result.playerId : '',
+              })),
+            }))
+          );
+          return;
+        }
+
+        setTeams(teamsData);
+      } catch (err) {
+        console.error("初期データ取得エラー", err);
+        setMessage({ type: 'error', text: '初期データの取得に失敗しました。' });
+      }
+    };
+
+    loadInitialData();
   }, []);
 
   const handleResultChange = (
@@ -44,6 +92,10 @@ export default function SchedulePage() {
     field: 'teamId' | 'playerId',
     value: string
   ) => {
+    if (field === 'teamId' && isManagerScoped) {
+      return;
+    }
+
     const newMatches = [...matches];
     const newResults = [...newMatches[matchIndex].results];
     newResults[resultIndex] = { ...newResults[resultIndex], [field]: value };
@@ -69,6 +121,12 @@ export default function SchedulePage() {
 
     const targetMatches = isDualMatch ? matches : matches.slice(0, 1);
 
+    if (isManagerScoped && targetMatches.some((m) => m.results.some((r) => r.teamId !== userTeamId))) {
+      setMessage({ type: 'error', text: '監督は自チームの選手のみ登録できます。' });
+      setIsLoading(false);
+      return;
+    }
+
     const hasIncomplete = targetMatches.some((m) =>
       m.results.some((r) => !r.teamId || !r.playerId)
     );
@@ -77,6 +135,15 @@ export default function SchedulePage() {
       setMessage({ type: 'error', text: 'すべての試合で4家のチームと選手を選択してください。' });
       setIsLoading(false);
       return;
+    }
+
+    if (isDualMatch) {
+      const allSelectedIds = targetMatches.flatMap((m) => m.results.map((r) => r.playerId));
+      if (new Set(allSelectedIds).size !== allSelectedIds.length) {
+        setMessage({ type: 'error', text: '2試合同時登録では同じ選手を重複して指定できません。' });
+        setIsLoading(false);
+        return;
+      }
     }
 
     const hasDuplicatePlayerInMatch = targetMatches.some((m) => {
@@ -128,6 +195,11 @@ export default function SchedulePage() {
             <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
               次回対戦カード（予告）登録 / 同時2試合対応
             </p>
+            {isManagerScoped && (
+              <p className="text-[10px] md:text-xs mt-2 text-yellow-400 tracking-wide font-bold">
+                監督モード: 所属チームの選手のみ選択できます
+              </p>
+            )}
           </div>
           <Link href="/" className="text-xs md:text-sm text-gray-400 hover:text-yellow-500 transition-colors">
             トップへ戻る
@@ -190,7 +262,8 @@ export default function SchedulePage() {
 
                 <div className="space-y-4">
                   {match.results.map((result, resultIndex) => {
-                    const selectedTeam = teams.find(t => t.id === result.teamId);
+                    const resolvedTeamId = isManagerScoped ? userTeamId : result.teamId;
+                    const selectedTeam = teams.find(t => t.id === resolvedTeamId);
                     return (
                       <div key={resultIndex} className="flex flex-col md:flex-row gap-4 bg-black/50 p-4 border border-white/5 rounded-sm items-center">
                         <div className="w-full md:w-32 text-center md:text-left">
@@ -199,23 +272,29 @@ export default function SchedulePage() {
                         </div>
 
                         <div className="flex-1 w-full">
-                          <select
-                            value={result.teamId}
-                            onChange={(e) => handleResultChange(matchIndex, resultIndex, 'teamId', e.target.value)}
-                            className="w-full bg-[#111] border border-white/10 p-2 text-white focus:outline-none focus:border-yellow-500"
-                          >
-                            <option value="">チームを選択</option>
-                            {teams.map(t => (
-                              <option key={t.id} value={t.id}>{t.name}</option>
-                            ))}
-                          </select>
+                          {isManagerScoped ? (
+                            <div className="w-full bg-[#111] border border-yellow-500/40 p-2 text-yellow-300 font-bold">
+                              {selectedTeam?.name || '所属チーム未設定'}
+                            </div>
+                          ) : (
+                            <select
+                              value={result.teamId}
+                              onChange={(e) => handleResultChange(matchIndex, resultIndex, 'teamId', e.target.value)}
+                              className="w-full bg-[#111] border border-white/10 p-2 text-white focus:outline-none focus:border-yellow-500"
+                            >
+                              <option value="">チームを選択</option>
+                              {teams.map(t => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                              ))}
+                            </select>
+                          )}
                         </div>
 
                         <div className="flex-1 w-full">
                           <select
                             value={result.playerId}
                             onChange={(e) => handleResultChange(matchIndex, resultIndex, 'playerId', e.target.value)}
-                            disabled={!result.teamId}
+                            disabled={!resolvedTeamId}
                             className="w-full bg-[#111] border border-white/10 p-2 text-white focus:outline-none focus:border-yellow-500 disabled:opacity-50"
                           >
                             <option value="">出場選手を選択</option>

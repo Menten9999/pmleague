@@ -7,34 +7,43 @@ type Player = { id: string; name: string };
 type Team = { id: string; name: string; players: Player[] };
 type UserRole = 'ADMIN' | 'MANAGER' | 'GUEST';
 type SessionUser = { role?: UserRole; teamId?: string | null };
-type MatchEntry = {
-  title: string;
-  results: { teamId: string; playerId: string }[];
+type ScheduledResult = {
+  playerId: string;
+  playerName: string;
+  teamId: string;
+  teamName: string;
+  wind: 'EAST' | 'SOUTH' | 'WEST' | 'NORTH' | null;
+};
+type ScheduledMatch = {
+  id: string;
+  title: string | null;
+  selectedTeamsCount: number;
+  isWindAssigned: boolean;
+  results: ScheduledResult[];
 };
 
-const createEmptyResults = () => [
-  { teamId: '', playerId: '' },
-  { teamId: '', playerId: '' },
-  { teamId: '', playerId: '' },
-  { teamId: '', playerId: '' },
-];
-
 export default function SchedulePage() {
-  const [teams, setTeams] = useState<Team[]>([]);
   const [userRole, setUserRole] = useState<UserRole>('GUEST');
   const [userTeamId, setUserTeamId] = useState('');
+  const [ownTeam, setOwnTeam] = useState<Team | null>(null);
+  const [scheduledMatches, setScheduledMatches] = useState<ScheduledMatch[]>([]);
+
   const [isDualMatch, setIsDualMatch] = useState(false);
+  const [adminTitles, setAdminTitles] = useState(['', '']);
+
+  const [selectedMatchId, setSelectedMatchId] = useState('');
+  const [selectedPlayerId, setSelectedPlayerId] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  // 1回で最大2試合分を入力できる
-  const [matches, setMatches] = useState<MatchEntry[]>([
-    { title: '', results: createEmptyResults() },
-    { title: '', results: createEmptyResults() },
-  ]);
-
-  const winds = ["東家 (TON)", "南家 (NAN)", "西家 (XIA)", "北家 (PEI)"];
   const isManagerScoped = userRole === 'MANAGER' && !!userTeamId;
+
+  const reloadScheduledMatches = async () => {
+    const scheduleRes = await fetch('/api/matches/schedule', { cache: 'no-store' });
+    const scheduleData: ScheduledMatch[] = await scheduleRes.json();
+    setScheduledMatches(scheduleData);
+  };
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -58,25 +67,14 @@ export default function SchedulePage() {
           const ownTeam = teamsData.find((team) => team.id === teamId);
           if (!ownTeam) {
             setMessage({ type: 'error', text: 'あなたの所属チーム情報を取得できませんでした。管理者に確認してください。' });
-            setTeams([]);
+            setOwnTeam(null);
             return;
           }
 
-          setTeams([ownTeam]);
-
-          setMatches((prev) =>
-            prev.map((match) => ({
-              ...match,
-              results: match.results.map((result) => ({
-                teamId,
-                playerId: ownTeam.players.some((p) => p.id === result.playerId) ? result.playerId : '',
-              })),
-            }))
-          );
-          return;
+          setOwnTeam(ownTeam);
         }
 
-        setTeams(teamsData);
+        await reloadScheduledMatches();
       } catch (err) {
         console.error("初期データ取得エラー", err);
         setMessage({ type: 'error', text: '初期データの取得に失敗しました。' });
@@ -86,73 +84,15 @@ export default function SchedulePage() {
     loadInitialData();
   }, []);
 
-  const handleResultChange = (
-    matchIndex: number,
-    resultIndex: number,
-    field: 'teamId' | 'playerId',
-    value: string
-  ) => {
-    if (field === 'teamId' && isManagerScoped) {
-      return;
-    }
-
-    const newMatches = [...matches];
-    const newResults = [...newMatches[matchIndex].results];
-    newResults[resultIndex] = { ...newResults[resultIndex], [field]: value };
-
-    if (field === 'teamId') {
-      newResults[resultIndex].playerId = ''; // チームが変わったら選手をリセット
-    }
-
-    newMatches[matchIndex] = { ...newMatches[matchIndex], results: newResults };
-    setMatches(newMatches);
-  };
-
-  const handleTitleChange = (matchIndex: number, value: string) => {
-    const newMatches = [...matches];
-    newMatches[matchIndex] = { ...newMatches[matchIndex], title: value };
-    setMatches(newMatches);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage({ type: '', text: '' });
 
-    const targetMatches = isDualMatch ? matches : matches.slice(0, 1);
+    const targetTitles = (isDualMatch ? adminTitles : adminTitles.slice(0, 1)).map((title) => title.trim());
 
-    if (isManagerScoped && targetMatches.some((m) => m.results.some((r) => r.teamId !== userTeamId))) {
-      setMessage({ type: 'error', text: '監督は自チームの選手のみ登録できます。' });
-      setIsLoading(false);
-      return;
-    }
-
-    const hasIncomplete = targetMatches.some((m) =>
-      m.results.some((r) => !r.teamId || !r.playerId)
-    );
-
-    if (hasIncomplete) {
-      setMessage({ type: 'error', text: 'すべての試合で4家のチームと選手を選択してください。' });
-      setIsLoading(false);
-      return;
-    }
-
-    if (isDualMatch) {
-      const allSelectedIds = targetMatches.flatMap((m) => m.results.map((r) => r.playerId));
-      if (new Set(allSelectedIds).size !== allSelectedIds.length) {
-        setMessage({ type: 'error', text: '2試合同時登録では同じ選手を重複して指定できません。' });
-        setIsLoading(false);
-        return;
-      }
-    }
-
-    const hasDuplicatePlayerInMatch = targetMatches.some((m) => {
-      const ids = m.results.map((r) => r.playerId);
-      return new Set(ids).size !== ids.length;
-    });
-
-    if (hasDuplicatePlayerInMatch) {
-      setMessage({ type: 'error', text: '同一試合に同じ選手を重複登録できません。' });
+    if (targetTitles.some((title) => !title)) {
+      setMessage({ type: 'error', text: '作成する試合名を入力してください。' });
       setIsLoading(false);
       return;
     }
@@ -161,18 +101,16 @@ export default function SchedulePage() {
       const res = await fetch('/api/matches/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matches: targetMatches }),
+        body: JSON.stringify({ matches: targetTitles.map((title) => ({ title })) }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ type: 'success', text: data.message || '次回予告を登録しました！' });
-        setMatches([
-          { title: '', results: createEmptyResults() },
-          { title: '', results: createEmptyResults() },
-        ]);
+        setMessage({ type: 'success', text: data.message || '次回予定を登録しました！' });
+        setAdminTitles(['', '']);
         setIsDualMatch(false);
+        await reloadScheduledMatches();
       } else {
         setMessage({ type: 'error', text: data.error || '登録に失敗しました' });
       }
@@ -182,6 +120,47 @@ export default function SchedulePage() {
       setIsLoading(false);
     }
   };
+
+  const handleSubmitManagerEntry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage({ type: '', text: '' });
+
+    if (!selectedMatchId || !selectedPlayerId) {
+      setMessage({ type: 'error', text: '試合と出場選手を選択してください。' });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/matches/schedule/entry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId: selectedMatchId, playerId: selectedPlayerId }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setMessage({ type: 'success', text: data.message || '出場選手を登録しました。' });
+        await reloadScheduledMatches();
+      } else {
+        setMessage({ type: 'error', text: data.error || '登録に失敗しました' });
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: '通信エラーが発生しました' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const selectedMatch = scheduledMatches.find((match) => match.id === selectedMatchId);
+  const mySelectedPlayerId = selectedMatch?.results.find((r) => r.teamId === userTeamId)?.playerId || '';
+  const isSelectedMatchLocked = !!selectedMatch?.isWindAssigned;
+
+  useEffect(() => {
+    if (!selectedMatchId || !isManagerScoped) return;
+    setSelectedPlayerId(mySelectedPlayerId);
+  }, [selectedMatchId, mySelectedPlayerId, isManagerScoped]);
 
   return (
     <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans flex flex-col items-center">
@@ -193,11 +172,11 @@ export default function SchedulePage() {
               NEXT MATCH SETUP
             </h1>
             <p className="text-gray-500 text-[10px] md:text-xs mt-1 tracking-[0.12em] md:tracking-[0.2em] uppercase font-bold">
-              次回対戦カード（予告）登録 / 同時2試合対応
+              次回対戦カード（予告）登録 / 出場選手提出
             </p>
             {isManagerScoped && (
               <p className="text-[10px] md:text-xs mt-2 text-yellow-400 tracking-wide font-bold">
-                監督モード: 所属チームの選手のみ選択できます
+                監督モード: 試合を選択して所属選手から1名を提出してください
               </p>
             )}
           </div>
@@ -212,113 +191,161 @@ export default function SchedulePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
+        {userRole === 'ADMIN' && (
+          <form onSubmit={handleCreateSchedule} className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-          <div className="mb-6 sm:mb-8 p-4 bg-black/40 border border-white/10 rounded-sm">
-            <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">登録モード</label>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-              <label className="flex items-center gap-2 text-sm text-gray-300">
-                <input
-                  type="radio"
-                  name="matchMode"
-                  checked={!isDualMatch}
-                  onChange={() => setIsDualMatch(false)}
-                />
-                1試合登録
-              </label>
-              <label className="flex items-center gap-2 text-sm text-gray-300">
-                <input
-                  type="radio"
-                  name="matchMode"
-                  checked={isDualMatch}
-                  onChange={() => setIsDualMatch(true)}
-                />
-                2試合同時登録
-              </label>
+            <div className="mb-6 sm:mb-8 p-4 bg-black/40 border border-white/10 rounded-sm">
+              <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">登録モード</label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                <label className="flex items-center gap-2 text-sm text-gray-300">
+                  <input
+                    type="radio"
+                    name="matchMode"
+                    checked={!isDualMatch}
+                    onChange={() => setIsDualMatch(false)}
+                  />
+                  1試合登録
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-300">
+                  <input
+                    type="radio"
+                    name="matchMode"
+                    checked={isDualMatch}
+                    onChange={() => setIsDualMatch(true)}
+                  />
+                  2試合同時登録
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-8">
-            {(isDualMatch ? matches : matches.slice(0, 1)).map((match, matchIndex) => (
-              <div key={matchIndex} className="p-4 bg-black/40 border border-white/10 rounded-sm">
-                <div className="mb-4">
+            <div className="space-y-4">
+              {(isDualMatch ? [0, 1] : [0]).map((index) => (
+                <div key={index}>
                   <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">
-                    試合名（第〇節 第〇試合 など）
+                    試合名
                   </label>
                   <input
                     type="text"
-                    value={match.title}
-                    onChange={(e) => handleTitleChange(matchIndex, e.target.value)}
+                    value={adminTitles[index]}
+                    onChange={(e) => {
+                      const next = [...adminTitles];
+                      next[index] = e.target.value;
+                      setAdminTitles(next);
+                    }}
                     className="w-full bg-black border border-white/10 p-3 text-white focus:outline-none focus:border-yellow-500"
-                    placeholder={`例: 第2節 第${matchIndex + 1}試合`}
+                    placeholder={`例: 第2節 第${index + 1}試合`}
                     required
                   />
                 </div>
+              ))}
+            </div>
 
-                <div className="mb-3 text-xs font-bold tracking-widest uppercase text-yellow-500">
-                  Match {matchIndex + 1}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:bg-gray-700 text-black font-black italic py-4 transition-all tracking-widest mt-8"
+            >
+              {isLoading ? "SAVING..." : isDualMatch ? "2試合の予定を登録する" : "試合予定を登録する"}
+            </button>
+          </form>
+        )}
+
+        {isManagerScoped && ownTeam && (
+          <form onSubmit={handleSubmitManagerEntry} className="bg-[#111] border border-white/10 p-5 sm:p-8 rounded-sm shadow-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
+
+            <div className="mb-6 p-4 bg-black/40 border border-white/10 rounded-sm">
+              <div className="text-xs text-gray-400 tracking-widest uppercase mb-2">あなたのチーム</div>
+              <div className="text-lg font-black italic text-yellow-400">{ownTeam.name}</div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">対象試合</label>
+                <select
+                  value={selectedMatchId}
+                  onChange={(e) => setSelectedMatchId(e.target.value)}
+                  className="w-full bg-black border border-white/10 p-3 text-white focus:outline-none focus:border-yellow-500"
+                >
+                  <option value="">試合を選択</option>
+                  {scheduledMatches
+                    .filter((match) => !match.isWindAssigned)
+                    .map((match) => (
+                    <option key={match.id} value={match.id}>
+                      {match.title || '次回 対戦カード'} / 提出済み {match.selectedTeamsCount}/4
+                    </option>
+                    ))}
+                </select>
+                {scheduledMatches.every((match) => match.isWindAssigned) && (
+                  <p className="text-xs text-gray-500 mt-2">提出可能な試合は現在ありません。</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-2">出場選手</label>
+                <select
+                  value={selectedPlayerId}
+                  onChange={(e) => setSelectedPlayerId(e.target.value)}
+                  disabled={!selectedMatchId || isSelectedMatchLocked}
+                  className="w-full bg-black border border-white/10 p-3 text-white focus:outline-none focus:border-yellow-500 disabled:opacity-50"
+                >
+                  <option value="">選手を選択</option>
+                  {ownTeam.players.map((player) => (
+                    <option key={player.id} value={player.id}>{player.name}</option>
+                  ))}
+                </select>
+                {isSelectedMatchLocked && (
+                  <p className="text-xs text-red-400 mt-2">この試合は方角抽選が完了しているため再提出できません。</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading || !selectedMatchId || !selectedPlayerId || isSelectedMatchLocked}
+                className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:bg-gray-700 text-black font-black italic py-4 transition-all tracking-widest"
+              >
+                {isLoading ? 'SAVING...' : '出場選手を登録する'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {!isManagerScoped && userRole !== 'ADMIN' && (
+          <div className="bg-[#111] border border-white/10 p-6 rounded-sm text-center text-gray-400">
+            この画面は管理者または監督のみ利用できます。
+          </div>
+        )}
+
+        <div className="mt-8 bg-[#111] border border-white/10 p-5 sm:p-6 rounded-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
+          <div className="mb-3 text-xs font-bold tracking-widest uppercase text-yellow-500">
+            現在の試合予定
+          </div>
+
+          <div className="space-y-3">
+            {scheduledMatches.map((match) => (
+              <div key={match.id} className="bg-black/40 border border-white/10 p-4 rounded-sm">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="font-bold tracking-wide text-white">{match.title || '次回 対戦カード'}</div>
+                  <div className="text-xs text-gray-400">提出済み: {match.selectedTeamsCount}/4</div>
                 </div>
 
-                <div className="space-y-4">
-                  {match.results.map((result, resultIndex) => {
-                    const resolvedTeamId = isManagerScoped ? userTeamId : result.teamId;
-                    const selectedTeam = teams.find(t => t.id === resolvedTeamId);
-                    return (
-                      <div key={resultIndex} className="flex flex-col md:flex-row gap-4 bg-black/50 p-4 border border-white/5 rounded-sm items-center">
-                        <div className="w-full md:w-32 text-center md:text-left">
-                          <span className="text-xl font-black italic text-yellow-500 tracking-widest">{winds[resultIndex].split(' ')[0]}</span>
-                          <span className="text-[10px] text-gray-500 ml-2">{winds[resultIndex].split(' ')[1]}</span>
-                        </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  {match.isWindAssigned ? '全監督提出完了: 方角抽選済み' : '監督の提出待ち'}
+                </div>
 
-                        <div className="flex-1 w-full">
-                          {isManagerScoped ? (
-                            <div className="w-full bg-[#111] border border-yellow-500/40 p-2 text-yellow-300 font-bold">
-                              {selectedTeam?.name || '所属チーム未設定'}
-                            </div>
-                          ) : (
-                            <select
-                              value={result.teamId}
-                              onChange={(e) => handleResultChange(matchIndex, resultIndex, 'teamId', e.target.value)}
-                              className="w-full bg-[#111] border border-white/10 p-2 text-white focus:outline-none focus:border-yellow-500"
-                            >
-                              <option value="">チームを選択</option>
-                              {teams.map(t => (
-                                <option key={t.id} value={t.id}>{t.name}</option>
-                              ))}
-                            </select>
-                          )}
-                        </div>
-
-                        <div className="flex-1 w-full">
-                          <select
-                            value={result.playerId}
-                            onChange={(e) => handleResultChange(matchIndex, resultIndex, 'playerId', e.target.value)}
-                            disabled={!resolvedTeamId}
-                            className="w-full bg-[#111] border border-white/10 p-2 text-white focus:outline-none focus:border-yellow-500 disabled:opacity-50"
-                          >
-                            <option value="">出場選手を選択</option>
-                            {selectedTeam?.players.map(p => (
-                              <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="mt-3 text-xs text-gray-300">
+                  提出済み選手: {match.results.length > 0 ? match.results.map((r) => `${r.teamName} / ${r.playerName}`).join(' , ') : 'まだありません'}
                 </div>
               </div>
             ))}
-          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:bg-gray-700 text-black font-black italic py-4 transition-all tracking-widest mt-8"
-          >
-            {isLoading ? "SAVING..." : isDualMatch ? "2試合同時に登録する" : "次回予告として登録する"}
-          </button>
-        </form>
+            {scheduledMatches.length === 0 && (
+              <div className="text-center text-gray-500 py-6">現在登録されている試合予定はありません。</div>
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );

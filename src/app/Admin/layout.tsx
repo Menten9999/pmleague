@@ -1,4 +1,5 @@
 import { auth, signOut } from "@/auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
@@ -13,6 +14,18 @@ export default async function AdminLayout({
   if (!session?.user) {
     redirect("/Login");
   }
+
+  const role = (session.user as any).role as "ADMIN" | "MANAGER" | undefined;
+
+  const commonLinks = [
+    { href: "/Admin", label: "ホーム" },
+    { href: "/Admin/Schedule", label: "試合日程" },
+    { href: "/Admin/Scores", label: "結果入力" },
+    { href: "/Admin/Teams", label: "チーム管理" },
+    { href: "/Admin/Archive", label: "アーカイブ" },
+  ];
+
+  const adminOnlyLinks = [{ href: "/Admin/Users", label: "ユーザー管理" }];
 
   // 3. ログインしている場合は、ヘッダー付きで画面を表示する
   return (
@@ -35,6 +48,29 @@ export default async function AdminLayout({
             ログアウトして退出
           </button>
         </form>
+      </div>
+
+      <div className="bg-black/80 border-b border-white/10 px-3 sm:px-4 py-2 flex flex-wrap gap-2">
+        {commonLinks.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="text-[11px] sm:text-xs tracking-widest uppercase px-3 py-1.5 border border-white/15 text-gray-300 hover:text-yellow-400 hover:border-yellow-500 transition-colors"
+          >
+            {item.label}
+          </Link>
+        ))}
+
+        {role === "ADMIN" &&
+          adminOnlyLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-[11px] sm:text-xs tracking-widest uppercase px-3 py-1.5 border border-red-500/40 text-red-300 hover:text-red-100 hover:bg-red-500/20 transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
       </div>
 
       {/* スコア入力画面やチーム登録画面の中身がここに入ります */}

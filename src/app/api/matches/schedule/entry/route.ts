@@ -96,21 +96,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "自チームの選手のみ選択できます" }, { status: 403 });
     }
 
-    const duplicateInOtherMatch = await prisma.matchResult.findFirst({
-      where: {
-        playerId,
-        match: {
-          status: "SCHEDULED",
-          id: { not: matchId },
-        },
-      },
-      select: { id: true },
-    });
-
-    if (duplicateInOtherMatch) {
-      return NextResponse.json({ error: "同じ選手は別の予定試合に同時登録できません" }, { status: 400 });
-    }
-
     const teamExisting = await prisma.matchResult.findFirst({
       where: {
         matchId,

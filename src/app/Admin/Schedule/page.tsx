@@ -33,7 +33,7 @@ export default function SchedulePage() {
   const [userTeamId, setUserTeamId] = useState('');
   const [ownTeam, setOwnTeam] = useState<Team | null>(null);
   const [scheduledMatches, setScheduledMatches] = useState<ScheduledMatch[]>([]);
-  const [finishedMatches, setFinishedMatches] = useState<FinishedMatch[]>([]);
+  const [scheduledPlansForDelete, setScheduledPlansForDelete] = useState<FinishedMatch[]>([]);
 
   const [isDualMatch, setIsDualMatch] = useState(false);
   const [adminTitles, setAdminTitles] = useState(['', '']);
@@ -53,14 +53,14 @@ export default function SchedulePage() {
     setScheduledMatches(scheduleData);
   };
 
-  const reloadFinishedMatches = async () => {
+  const reloadScheduledPlansForDelete = async () => {
     const res = await fetch('/api/matches/schedule/finished', { cache: 'no-store' });
     if (!res.ok) {
-      setFinishedMatches([]);
+      setScheduledPlansForDelete([]);
       return;
     }
     const data: FinishedMatch[] = await res.json();
-    setFinishedMatches(data);
+    setScheduledPlansForDelete(data);
   };
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function SchedulePage() {
 
         await reloadScheduledMatches();
         if (role === 'ADMIN') {
-          await reloadFinishedMatches();
+          await reloadScheduledPlansForDelete();
         }
       } catch (err) {
         console.error("初期データ取得エラー", err);
@@ -132,7 +132,7 @@ export default function SchedulePage() {
         setAdminTitles(['', '']);
         setIsDualMatch(false);
         await reloadScheduledMatches();
-        await reloadFinishedMatches();
+        await reloadScheduledPlansForDelete();
       } else {
         setMessage({ type: 'error', text: data.error || '登録に失敗しました' });
       }
@@ -143,8 +143,8 @@ export default function SchedulePage() {
     }
   };
 
-  const handleDeleteFinishedMatch = async (matchId: string) => {
-    if (!window.confirm('この終了済み試合を削除します。よろしいですか？')) {
+  const handleDeleteScheduledPlan = async (matchId: string) => {
+    if (!window.confirm('この試合予定を削除します。よろしいですか？（試合結果データは削除されません）')) {
       return;
     }
 
@@ -160,8 +160,9 @@ export default function SchedulePage() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ type: 'success', text: data.message || '終了済み試合を削除しました。' });
-        await reloadFinishedMatches();
+        setMessage({ type: 'success', text: data.message || '試合予定を削除しました。' });
+        await reloadScheduledPlansForDelete();
+        await reloadScheduledMatches();
       } else {
         setMessage({ type: 'error', text: data.error || '削除に失敗しました' });
       }
@@ -303,13 +304,13 @@ export default function SchedulePage() {
             </form>
 
             <div className="mt-6 bg-[#111] border border-red-500/30 p-5 sm:p-6 rounded-sm">
-              <div className="text-xs font-bold tracking-widest uppercase text-red-400 mb-3">終了済み試合の削除</div>
+              <div className="text-xs font-bold tracking-widest uppercase text-red-400 mb-3">試合予定の削除</div>
               <div className="mb-4 p-3 border border-red-500/30 bg-red-950/20 rounded-sm text-xs text-red-200 leading-relaxed">
-                この操作は取り消せません。削除対象の試合名・日時・結果件数を確認してから実行してください。
+                この操作は取り消せません。削除されるのは試合予定（SCHEDULED）のみで、終了済みの試合結果データは削除されません。
               </div>
 
               <div className="space-y-3">
-                {finishedMatches.map((match) => (
+                {scheduledPlansForDelete.map((match) => (
                   <div key={match.id} className="bg-black/50 border border-red-500/20 p-4 rounded-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -324,7 +325,7 @@ export default function SchedulePage() {
 
                     <button
                       type="button"
-                      onClick={() => handleDeleteFinishedMatch(match.id)}
+                      onClick={() => handleDeleteScheduledPlan(match.id)}
                       disabled={deletingMatchId === match.id}
                       className="px-4 py-2 text-xs font-black tracking-widest uppercase border border-red-500 text-red-300 bg-red-950/30 hover:bg-red-500 hover:text-black disabled:opacity-60 disabled:cursor-not-allowed"
                     >
@@ -333,8 +334,8 @@ export default function SchedulePage() {
                   </div>
                 ))}
 
-                {finishedMatches.length === 0 && (
-                  <div className="text-center text-gray-500 py-4">削除対象の終了済み試合はありません。</div>
+                {scheduledPlansForDelete.length === 0 && (
+                  <div className="text-center text-gray-500 py-4">削除対象の試合予定はありません。</div>
                 )}
               </div>
             </div>

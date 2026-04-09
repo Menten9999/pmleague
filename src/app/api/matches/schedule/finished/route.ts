@@ -17,9 +17,9 @@ export async function GET() {
       return NextResponse.json({ error: "この一覧は管理者のみ閲覧できます" }, { status: 403 });
     }
 
-    const finishedMatches = await prisma.match.findMany({
-      where: { status: "FINISHED" },
-      orderBy: { date: "desc" },
+    const scheduledMatches = await prisma.match.findMany({
+      where: { status: "SCHEDULED" },
+      orderBy: { date: "asc" },
       include: {
         _count: {
           select: { results: true },
@@ -28,7 +28,7 @@ export async function GET() {
     });
 
     return NextResponse.json(
-      finishedMatches.map((match) => ({
+      scheduledMatches.map((match) => ({
         id: match.id,
         title: match.title,
         date: match.date,
@@ -37,7 +37,7 @@ export async function GET() {
     );
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "終了試合一覧の取得に失敗しました" }, { status: 500 });
+    return NextResponse.json({ error: "試合予定一覧の取得に失敗しました" }, { status: 500 });
   }
 }
 
@@ -70,8 +70,8 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "対象試合が見つかりません" }, { status: 404 });
     }
 
-    if (target.status !== "FINISHED") {
-      return NextResponse.json({ error: "終了済み試合のみ削除できます" }, { status: 400 });
+    if (target.status !== "SCHEDULED") {
+      return NextResponse.json({ error: "試合予定（SCHEDULED）のみ削除できます" }, { status: 400 });
     }
 
     await prisma.$transaction(async (tx) => {
@@ -79,7 +79,7 @@ export async function DELETE(req: Request) {
       await tx.match.delete({ where: { id: matchId } });
     });
 
-    return NextResponse.json({ message: "終了済み試合を削除しました" });
+    return NextResponse.json({ message: "試合予定を削除しました（試合結果データは保持されます）" });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "削除中にエラーが発生しました" }, { status: 500 });

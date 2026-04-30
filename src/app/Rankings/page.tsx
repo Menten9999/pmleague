@@ -119,23 +119,29 @@ export default async function RankingsPage() {
   return (
     <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans">
       <div className="max-w-6xl mx-auto mt-8 md:mt-10">
-        
-        <div className="text-center mb-10 md:mb-16 border-b border-white/10 pb-5 md:pb-6">
+        <div className="bg-[#090909] border border-white/15 rounded-2xl shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_24px_80px_rgba(0,0,0,0.55)] overflow-hidden">
+          <div className="border-b border-white/10 bg-black/40 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+            <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold">RANKINGS BOARD</div>
+            <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold">PM LEAGUE</div>
+          </div>
+          <div className="p-4 md:p-6">
+
+        <div className="text-center mb-10 md:mb-16 border border-white/10 rounded-xl bg-black/30 pb-5 md:pb-6 pt-6 md:pt-8 px-4 md:px-6">
           <h1 className="text-4xl sm:text-5xl font-black italic tracking-tighter text-yellow-500">RANKINGS</h1>
           <p className="text-gray-500 text-xs md:text-sm mt-2 tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold">PMリーグ 最新ランキング</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           
-          <section>
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2">
+          <section className="border border-white/10 rounded-xl bg-black/20 overflow-hidden">
+            <div className="mb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5">
               <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">TEAM RANKING</h2>
               <span className="text-[10px] text-gray-500 tracking-widest uppercase">チーム成績</span>
             </div>
             
-            <div className="space-y-3">
+            <div className="p-4 sm:p-6 space-y-3">
               {teams.map((team, index) => (
-                <div key={team.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
+                <div key={team.id} className="bg-[#111] border border-white/15 p-3 md:p-4 rounded-lg relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
                   <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: team.color || '#eab308' }}></div>
                   
                   <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
@@ -166,21 +172,21 @@ export default async function RankingsPage() {
             </div>
           </section>
 
-          <section className="lg:col-span-2">
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2">
+          <section className="lg:col-span-2 border border-white/10 rounded-xl bg-black/20 overflow-hidden">
+            <div className="mb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5">
               <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">PLAYER RANKING</h2>
               <span className="text-[10px] text-gray-500 tracking-widest uppercase">個人成績</span>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-4">
-              <div className="bg-[#0f0f0f] border border-white/15 rounded-md overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
+            <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-4">
+              <div className="bg-[#0f0f0f] border border-white/15 rounded-xl overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
                 <div className="px-4 py-3 bg-black/70 border-b border-yellow-600/20 flex items-center justify-between gap-3">
                   <div className="text-sm font-bold text-yellow-500 tracking-[0.2em] uppercase">ポイント</div>
                   <div className="text-[10px] text-gray-500 tracking-widest uppercase">総合スコア</div>
                 </div>
                 <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
                   {players.map((player, index) => (
-                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-md relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
+                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-lg relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
                       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
                       <div className="m-ranking-left gap-3 flex-grow pr-3">
                         <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
@@ -198,14 +204,14 @@ export default async function RankingsPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0f0f0f] border border-white/15 rounded-md overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
+              <div className="bg-[#0f0f0f] border border-white/15 rounded-xl overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
                 <div className="px-4 py-3 bg-black/70 border-b border-green-600/20 flex items-center justify-between gap-3">
                   <div className="text-sm font-bold text-green-400 tracking-[0.2em] uppercase">トップ数</div>
                   <div className="text-[10px] text-gray-500 tracking-widest uppercase">1位回数</div>
                 </div>
                 <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
                   {topCountRanked.map((player, index) => (
-                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-md relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
+                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-lg relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
                       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
                       <div className="m-ranking-left gap-3 flex-grow pr-3">
                         <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
@@ -224,14 +230,14 @@ export default async function RankingsPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0f0f0f] border border-white/15 rounded-md overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
+              <div className="bg-[#0f0f0f] border border-white/15 rounded-xl overflow-hidden shadow-[0_0_18px_rgba(0,0,0,0.2)]">
                 <div className="px-4 py-3 bg-black/70 border-b border-blue-600/20 flex items-center justify-between gap-3">
                   <div className="text-sm font-bold text-blue-400 tracking-[0.2em] uppercase">ラス回避率</div>
                   <div className="text-[10px] text-gray-500 tracking-widest uppercase">最下位回避</div>
                 </div>
                 <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
                   {lastAvoidRanked.map((player, index) => (
-                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-md relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
+                    <div key={player.id} className="bg-black/40 border border-white/15 p-3 rounded-lg relative overflow-hidden transition-colors hover:border-white/35 m-ranking-row">
                       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
                       <div className="m-ranking-left gap-3 flex-grow pr-3">
                         <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
@@ -254,8 +260,10 @@ export default async function RankingsPage() {
 
         </div>
         
-        <div className="mt-16 text-center pb-10">
+          <div className="mt-16 text-center pb-10">
            <Link href="/" className="text-sm text-gray-400 hover:text-yellow-500 transition-colors tracking-widest uppercase">← BACK TO TOP</Link>
+          </div>
+        </div>
         </div>
       </div>
     </main>

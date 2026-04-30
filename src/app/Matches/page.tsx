@@ -75,7 +75,7 @@ export default async function MatchesPage() {
                   : match.results;
 
                 return (
-                  <div key={match.id} className="bg-[#0b0b0b] border border-yellow-600/30 rounded-sm shadow-[0_0_30px_rgba(234,179,8,0.1)] relative overflow-hidden">
+                  <div key={match.id} className="bg-[#0b0b0b] border border-yellow-600/40 rounded-md shadow-[0_0_30px_rgba(234,179,8,0.1)] ring-1 ring-white/5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
                     <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent">
@@ -116,7 +116,7 @@ export default async function MatchesPage() {
                             : 'text-yellow-500';
 
                         return (
-                          <div key={res.id} className="bg-black border border-white/10 rounded-sm relative overflow-hidden min-h-32">
+                          <div key={res.id} className="bg-black border border-white/15 rounded-md relative overflow-hidden min-h-32 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
                             <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
                             <div className="p-4 h-full flex flex-col justify-between gap-4">
                               <div className="flex items-start justify-between gap-3">
@@ -140,7 +140,7 @@ export default async function MatchesPage() {
                       })}
 
                       {match.results.length === 0 && (
-                        <div className="col-span-full text-center text-gray-500 py-10 font-bold tracking-wide border border-dashed border-white/10 rounded-sm bg-black/30">
+                        <div className="col-span-full text-center text-gray-500 py-10 font-bold tracking-wide border border-dashed border-white/15 rounded-md bg-black/30">
                           監督の出場選手提出を待っています。
                         </div>
                       )}

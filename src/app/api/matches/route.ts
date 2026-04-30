@@ -6,6 +6,24 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const { title, results } = await req.json();
+    const rankedResults = [...results]
+      .map((res: any, index: number) => ({
+        ...res,
+        rawScore: Number(res.rawScore),
+        points: Number(res.points),
+        originalIndex: index,
+      }))
+      .sort((a, b) => {
+        if (b.points !== a.points) {
+          return b.points - a.points;
+        }
+
+        if (b.rawScore !== a.rawScore) {
+          return b.rawScore - a.rawScore;
+        }
+
+        return a.originalIndex - b.originalIndex;
+      });
 
     // トランザクション（以下の処理を「すべて成功するか、すべて失敗するか」のセットにする）
     const match = await prisma.$transaction(async (tx) => {
@@ -18,14 +36,15 @@ export async function POST(req: Request) {
       });
 
       // 2. 4人分の成績（MatchResult）を保存し、トータルスコアを更新
-      for (const res of results) {
+      for (const [index, res] of rankedResults.entries()) {
         // 成績を保存
         await tx.matchResult.create({
           data: {
             matchId: newMatch.id,
             playerId: res.playerId,
-            rawScore: Number(res.rawScore),
-            points: Number(res.points),
+            rawScore: res.rawScore,
+            points: res.points,
+            rank: index + 1,
           },
         });
 

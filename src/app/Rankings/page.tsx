@@ -17,21 +17,84 @@ export default async function RankingsPage() {
     orderBy: { totalScore: 'desc' },
   });
 
-  // 各プレイヤーの統計情報を計算
-  const playerStats = players.map(player => {
-    const totalMatches = player.matchResults.length;
-    const topCount = player.matchResults.filter(r => r.rank === 1).length;
-    const lastCount = player.matchResults.filter(r => r.rank === 4).length;
-    const avoidLastRate = totalMatches > 0
-      ? Number((((totalMatches - lastCount) / totalMatches) * 100).toFixed(1))
-      : 0;
+  const playerStatsMap = new Map<
+    string,
+    {
+      totalMatches: number;
+      topCount: number;
+      lastCount: number;
+      avoidLastRate: number;
+    }
+  >();
+
+  players.forEach((player) => {
+    playerStatsMap.set(player.id, {
+      totalMatches: 0,
+      topCount: 0,
+      lastCount: 0,
+      avoidLastRate: 0,
+    });
+  });
+
+  const matchGroups = new Map<string, typeof players[number]['matchResults']>();
+
+  players.forEach((player) => {
+    player.matchResults.forEach((result) => {
+      const existingResults = matchGroups.get(result.matchId) ?? [];
+      existingResults.push(result);
+      matchGroups.set(result.matchId, existingResults);
+    });
+  });
+
+  matchGroups.forEach((matchResults) => {
+    const rankedResults = [...matchResults].sort((a, b) => {
+      const pointDiff = (b.points ?? 0) - (a.points ?? 0);
+      if (pointDiff !== 0) {
+        return pointDiff;
+      }
+
+      const rawScoreDiff = (b.rawScore ?? 0) - (a.rawScore ?? 0);
+      if (rawScoreDiff !== 0) {
+        return rawScoreDiff;
+      }
+
+      return a.id.localeCompare(b.id);
+    });
+
+    rankedResults.forEach((result, index) => {
+      const stats = playerStatsMap.get(result.playerId);
+
+      if (!stats) {
+        return;
+      }
+
+      stats.totalMatches += 1;
+
+      if (index === 0) {
+        stats.topCount += 1;
+      }
+
+      if (index === rankedResults.length - 1) {
+        stats.lastCount += 1;
+      }
+    });
+  });
+
+  const playerStats = players.map((player) => {
+    const stats = playerStatsMap.get(player.id) ?? {
+      totalMatches: 0,
+      topCount: 0,
+      lastCount: 0,
+      avoidLastRate: 0,
+    };
 
     return {
       ...player,
-      totalMatches,
-      topCount,
-      lastCount,
-      avoidLastRate,
+      ...stats,
+      avoidLastRate:
+        stats.totalMatches > 0
+          ? Number((((stats.totalMatches - stats.lastCount) / stats.totalMatches) * 100).toFixed(1))
+          : 0,
     };
   });
 
@@ -44,7 +107,11 @@ export default async function RankingsPage() {
   });
 
   const lastAvoidRanked = [...playerStats].sort((a, b) => {
-    return b.avoidLastRate - a.avoidLastRate;
+    if (b.avoidLastRate !== a.avoidLastRate) {
+      return b.avoidLastRate - a.avoidLastRate;
+    }
+
+    return b.topCount - a.topCount;
   });
 
   const topTeamScore = teams[0]?.totalScore ?? 0;

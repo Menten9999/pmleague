@@ -22,8 +22,8 @@ export default async function RankingsPage() {
     const totalMatches = player.matchResults.length;
     const topCount = player.matchResults.filter(r => r.rank === 1).length;
     const lastCount = player.matchResults.filter(r => r.rank === 4).length;
-    const avoidLastRate = totalMatches > 0 
-      ? ((totalMatches - lastCount) / totalMatches * 100).toFixed(1)
+    const avoidLastRate = totalMatches > 0
+      ? Number((((totalMatches - lastCount) / totalMatches) * 100).toFixed(1))
       : 0;
 
     return {
@@ -40,15 +40,14 @@ export default async function RankingsPage() {
     if (b.topCount !== a.topCount) {
       return b.topCount - a.topCount;
     }
-    return parseFloat(b.avoidLastRate) - parseFloat(a.avoidLastRate);
+    return b.avoidLastRate - a.avoidLastRate;
   });
 
   const lastAvoidRanked = [...playerStats].sort((a, b) => {
-    return parseFloat(b.avoidLastRate) - parseFloat(a.avoidLastRate);
+    return b.avoidLastRate - a.avoidLastRate;
   });
 
   const topTeamScore = teams[0]?.totalScore ?? 0;
-  const topPlayerScore = players[0]?.totalScore ?? 0;
 
   return (
     <main className="min-h-screen bg-[#050505] p-4 md:p-6 text-white font-sans">
@@ -110,35 +109,28 @@ export default async function RankingsPage() {
             <div className="mb-12">
               <div className="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-3 pl-2 border-l-2 border-yellow-600">ポイント</div>
               <div className="space-y-3">
-                {players.map((player, index) => {
-                  const stats = playerStats.find(p => p.id === player.id)!;
-                  return (
-                    <div key={player.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
-                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
-                      
-                      <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
-                        <div className="w-6 md:w-8 text-center font-black italic text-xl md:text-2xl text-gray-600 shrink-0">{index + 1}</div>
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black border border-white/10 rounded-full flex items-center justify-center shrink-0">
-                          <span className="text-[6px] text-gray-500">PHOTO</span>
-                        </div>
-                        <div className="flex flex-col truncate">
-                          <div className="text-sm md:text-lg font-bold tracking-wider truncate">{player.name}</div>
-                          <div className="text-[8px] md:text-[10px] text-gray-500 tracking-widest uppercase mt-0.5 truncate">{player.team?.name}</div>
-                        </div>
+                {players.map((player, index) => (
+                  <div key={player.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
+                    <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
+
+                    <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
+                      <div className="w-6 md:w-8 text-center font-black italic text-xl md:text-2xl text-gray-600 shrink-0">{index + 1}</div>
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-black border border-white/10 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-[6px] text-gray-500">PHOTO</span>
                       </div>
-                      
-                      <div className="m-ranking-right gap-3 md:gap-6">
-                        <div className={`text-lg md:text-2xl font-mono font-bold w-16 md:w-24 text-right shrink-0 ${player.totalScore >= 0 ? 'text-white' : 'text-red-500'}`}>
-                          {player.totalScore > 0 ? '+' : ''}{player.totalScore.toFixed(1)}
-                        </div>
-                        <div className="w-20 md:w-32 text-right text-[9px] md:text-xs text-gray-400 shrink-0">
-                          <div>T:{stats.topCount}</div>
-                          <div>L:{stats.lastCount}/{stats.totalMatches}</div>
-                        </div>
+                      <div className="flex flex-col truncate">
+                        <div className="text-sm md:text-lg font-bold tracking-wider truncate">{player.name}</div>
+                        <div className="text-[8px] md:text-[10px] text-gray-500 tracking-widest uppercase mt-0.5 truncate">{player.team?.name}</div>
                       </div>
                     </div>
-                  );
-                })}
+
+                    <div className="m-ranking-right gap-3 md:gap-6">
+                      <div className={`text-lg md:text-2xl font-mono font-bold w-16 md:w-24 text-right shrink-0 ${player.totalScore >= 0 ? 'text-white' : 'text-red-500'}`}>
+                        {player.totalScore > 0 ? '+' : ''}{player.totalScore.toFixed(1)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
                 {players.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
               </div>
             </div>

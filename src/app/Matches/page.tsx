@@ -56,8 +56,8 @@ export default async function MatchesPage() {
         {/* =========================================
             次回予告（NEXT MATCH）セクション
             ========================================= */}
-        <section className="mb-14 md:mb-20 pm-board-section">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5 pm-board-section-head">
+        <section className="mb-14 md:mb-20 pm-board-section pm-next-match-section">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5 pm-board-section-head pm-next-match-section-head">
             <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">
               NEXT MATCH
             </h2>
@@ -75,10 +75,10 @@ export default async function MatchesPage() {
                     : match.results;
 
                   return (
-                    <div key={match.id} className="pm-board-card shadow-[0_0_30px_rgba(234,179,8,0.1)] ring-1 ring-white/5 relative overflow-hidden">
+                    <div key={match.id} className="pm-board-card pm-next-match-card shadow-[0_0_30px_rgba(234,179,8,0.1)] ring-1 ring-white/5 relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-                      <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent pm-board-card-head">
+                      <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent pm-board-card-head pm-next-match-card-head">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                           <div>
                             <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold mb-2">NEXT MATCH CARD</div>
@@ -116,7 +116,7 @@ export default async function MatchesPage() {
                                 : 'text-yellow-500';
 
                             return (
-                              <div key={res.id} className="pm-board-row pm-board-card-accent relative overflow-hidden min-h-32">
+                              <div key={res.id} className="pm-board-row pm-board-card-accent pm-next-match-player pm-next-match-player-outline relative overflow-hidden min-h-32">
                                 <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
                                 <div className="p-4 h-full flex flex-col justify-between gap-4">
                                   <div className="flex items-start justify-between gap-3">
@@ -151,7 +151,7 @@ export default async function MatchesPage() {
                 })}
               </div>
             ) : (
-              <div className="bg-[#111] border border-white/10 p-12 text-center rounded-xl pm-board-outline">
+              <div className="bg-[#111] border border-white/10 p-12 text-center rounded-xl pm-board-outline pm-next-match-player-outline">
                 <div className="text-gray-500 font-bold tracking-widest">
                   次節の対戦カードは現在調整中です。
                 </div>

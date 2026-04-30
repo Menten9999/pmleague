@@ -141,6 +141,33 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
+.pm-next-match-section {
+  border-color: rgba(234, 179, 8, 0.45) !important;
+  box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.08), 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.pm-next-match-section-head {
+  border-bottom-color: rgba(234, 179, 8, 0.18) !important;
+}
+
+.pm-next-match-card {
+  border-color: rgba(234, 179, 8, 0.4) !important;
+  box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.08);
+}
+
+.pm-next-match-card-head {
+  border-bottom-color: rgba(234, 179, 8, 0.18) !important;
+}
+
+.pm-next-match-player {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+.pm-next-match-player-outline {
+  border-color: rgba(56, 189, 248, 0.18) !important;
+}
+
 
 /* =========================================
    🌟 修正ポイント：@layer の【外】に書く！

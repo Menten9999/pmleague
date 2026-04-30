@@ -53,7 +53,7 @@ export default async function MatchesPage() {
           </p>
         </div>
 
-{/* =========================================
+        {/* =========================================
             次回予告（NEXT MATCH）セクション
             ========================================= */}
         <section className="mb-14 md:mb-20 border border-white/10 rounded-xl bg-black/20 overflow-hidden">
@@ -65,98 +65,98 @@ export default async function MatchesPage() {
           </div>
 
           <div className="p-4 sm:p-6">
-          {upcomingMatches.length > 0 ? (
-            <div className="space-y-6">
-              {upcomingMatches.map((match) => {
-                const winds = ["EAST", "SOUTH", "WEST", "NORTH"] as const;
-                const isWindAssigned = match.results.length === 4 && match.results.every((res) => res.wind !== null);
-                const orderedResults = isWindAssigned
-                  ? [...match.results].sort((a, b) => winds.indexOf(a.wind as typeof winds[number]) - winds.indexOf(b.wind as typeof winds[number]))
-                  : match.results;
+            {upcomingMatches.length > 0 ? (
+              <div className="space-y-6">
+                {upcomingMatches.map((match) => {
+                  const winds = ["EAST", "SOUTH", "WEST", "NORTH"] as const;
+                  const isWindAssigned = match.results.length === 4 && match.results.every((res) => res.wind !== null);
+                  const orderedResults = isWindAssigned
+                    ? [...match.results].sort((a, b) => winds.indexOf(a.wind as typeof winds[number]) - winds.indexOf(b.wind as typeof winds[number]))
+                    : match.results;
 
-                return (
-                  <div key={match.id} className="bg-[#0b0b0b] border border-yellow-600/40 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.1)] ring-1 ring-white/5 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
+                  return (
+                    <div key={match.id} className="bg-[#0b0b0b] border border-yellow-600/40 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.1)] ring-1 ring-white/5 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-                    <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div>
-                          <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold mb-2">NEXT MATCH CARD</div>
-                          <div className="text-yellow-500 font-bold tracking-widest text-xl sm:text-2xl">{match.title}</div>
-                        </div>
-                        <div className="text-xs text-gray-400 tracking-widest uppercase">
-                          {isWindAssigned ? '出場予定選手（方角確定）' : `監督提出待ち (${new Set(match.results.map((r) => r.player.teamId)).size}/4)`}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 sm:p-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                      {orderedResults.map((res) => {
-                        const windLabel =
-                          res.wind === 'EAST'
-                            ? '東家'
-                            : res.wind === 'SOUTH'
-                            ? '南家'
-                            : res.wind === 'WEST'
-                            ? '西家'
-                            : res.wind === 'NORTH'
-                            ? '北家'
-                            : '提出済み';
-
-                        const windClass =
-                          res.wind === 'EAST'
-                            ? 'text-red-500'
-                            : res.wind === 'SOUTH'
-                            ? 'text-blue-500'
-                            : res.wind === 'WEST'
-                            ? 'text-green-500'
-                            : res.wind === 'NORTH'
-                            ? 'text-gray-300'
-                            : 'text-yellow-500';
-
-                        return (
-                          <div key={res.id} className="bg-black border border-white/15 rounded-lg relative overflow-hidden min-h-32 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
-                            <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
-                            <div className="p-4 h-full flex flex-col justify-between gap-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase ${windClass} bg-white/5 border border-white/10`}>
-                                  {windLabel}
-                                </div>
-                                <div className="text-[10px] text-gray-500 tracking-widest uppercase text-right">
-                                  {res.player.team?.name}
-                                </div>
-                              </div>
-
-                              <div className="space-y-1">
-                                <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Player</div>
-                                <div className="text-lg sm:text-xl font-bold text-white tracking-wider break-words">
-                                  {res.player.name}
-                                </div>
-                              </div>
-                            </div>
+                      <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div>
+                            <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold mb-2">NEXT MATCH CARD</div>
+                            <div className="text-yellow-500 font-bold tracking-widest text-xl sm:text-2xl">{match.title}</div>
                           </div>
-                        );
-                      })}
-
-                      {match.results.length === 0 && (
-                        <div className="col-span-full text-center text-gray-500 py-10 font-bold tracking-wide border border-dashed border-white/15 rounded-lg bg-black/30">
-                          監督の出場選手提出を待っています。
+                          <div className="text-xs text-gray-400 tracking-widest uppercase">
+                            {isWindAssigned ? '出場予定選手（方角確定）' : `監督提出待ち (${new Set(match.results.map((r) => r.player.teamId)).size}/4)`}
+                          </div>
                         </div>
-                      )}
+                      </div>
+
+                      <div className="p-4 sm:p-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                          {orderedResults.map((res) => {
+                            const windLabel =
+                              res.wind === 'EAST'
+                                ? '東家'
+                                : res.wind === 'SOUTH'
+                                ? '南家'
+                                : res.wind === 'WEST'
+                                ? '西家'
+                                : res.wind === 'NORTH'
+                                ? '北家'
+                                : '提出済み';
+
+                            const windClass =
+                              res.wind === 'EAST'
+                                ? 'text-red-500'
+                                : res.wind === 'SOUTH'
+                                ? 'text-blue-500'
+                                : res.wind === 'WEST'
+                                ? 'text-green-500'
+                                : res.wind === 'NORTH'
+                                ? 'text-gray-300'
+                                : 'text-yellow-500';
+
+                            return (
+                              <div key={res.id} className="bg-black border border-white/15 rounded-lg relative overflow-hidden min-h-32 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                                <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
+                                <div className="p-4 h-full flex flex-col justify-between gap-4">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase ${windClass} bg-white/5 border border-white/10`}>
+                                      {windLabel}
+                                    </div>
+                                    <div className="text-[10px] text-gray-500 tracking-widest uppercase text-right">
+                                      {res.player.team?.name}
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Player</div>
+                                    <div className="text-lg sm:text-xl font-bold text-white tracking-wider break-words">
+                                      {res.player.name}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {match.results.length === 0 && (
+                            <div className="col-span-full text-center text-gray-500 py-10 font-bold tracking-wide border border-dashed border-white/15 rounded-lg bg-black/30">
+                              監督の出場選手提出を待っています。
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="bg-[#111] border border-white/10 p-12 text-center rounded-xl">
-              <div className="text-gray-500 font-bold tracking-widest">
-                次節の対戦カードは現在調整中です。
+                  );
+                })}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="bg-[#111] border border-white/10 p-12 text-center rounded-xl">
+                <div className="text-gray-500 font-bold tracking-widest">
+                  次節の対戦カードは現在調整中です。
+                </div>
+              </div>
+            )}
           </div>
         </section>
         {/* =========================================

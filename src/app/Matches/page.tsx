@@ -75,17 +75,23 @@ export default async function MatchesPage() {
                   : match.results;
 
                 return (
-                  <div key={match.id} className="bg-[#111] border border-yellow-600/30 p-4 sm:p-8 rounded-sm shadow-[0_0_30px_rgba(234,179,8,0.1)] relative overflow-hidden">
+                  <div key={match.id} className="bg-[#0b0b0b] border border-yellow-600/30 rounded-sm shadow-[0_0_30px_rgba(234,179,8,0.1)] relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700"></div>
 
-                    <div className="text-center mb-8">
-                      <div className="text-yellow-500 font-bold tracking-widest mb-2 text-xl">{match.title}</div>
-                      <div className="text-xs text-gray-400 tracking-widest">
-                        {isWindAssigned ? '出場予定選手（方角確定）' : `監督提出待ち (${new Set(match.results.map((r) => r.player.teamId)).size}/4)`}
+                    <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-4 border-b border-white/10 bg-gradient-to-r from-black/70 to-transparent">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold mb-2">NEXT MATCH CARD</div>
+                          <div className="text-yellow-500 font-bold tracking-widest text-xl sm:text-2xl">{match.title}</div>
+                        </div>
+                        <div className="text-xs text-gray-400 tracking-widest uppercase">
+                          {isWindAssigned ? '出場予定選手（方角確定）' : `監督提出待ち (${new Set(match.results.map((r) => r.player.teamId)).size}/4)`}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 sm:p-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                       {orderedResults.map((res) => {
                         const windLabel =
                           res.wind === 'EAST'
@@ -110,16 +116,23 @@ export default async function MatchesPage() {
                             : 'text-yellow-500';
 
                         return (
-                          <div key={res.id} className="bg-black border border-white/10 p-3 sm:p-4 text-center rounded-sm relative overflow-hidden flex flex-col justify-center items-center min-h-28 sm:h-32">
-                            <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
-
-                            <div className="z-10 relative">
-                              <div className={`text-sm font-black italic ${windClass} mb-1`}>{windLabel}</div>
-                              <div className="text-[10px] text-gray-500 tracking-widest uppercase mb-1">
-                                {res.player.team?.name}
+                          <div key={res.id} className="bg-black border border-white/10 rounded-sm relative overflow-hidden min-h-32">
+                            <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: res.player.team?.color || '#eab308' }}></div>
+                            <div className="p-4 h-full flex flex-col justify-between gap-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase ${windClass} bg-white/5 border border-white/10`}>
+                                  {windLabel}
+                                </div>
+                                <div className="text-[10px] text-gray-500 tracking-widest uppercase text-right">
+                                  {res.player.team?.name}
+                                </div>
                               </div>
-                              <div className="text-xl font-bold text-white tracking-wider">
-                                {res.player.name}
+
+                              <div className="space-y-1">
+                                <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Player</div>
+                                <div className="text-lg sm:text-xl font-bold text-white tracking-wider break-words">
+                                  {res.player.name}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -127,10 +140,11 @@ export default async function MatchesPage() {
                       })}
 
                       {match.results.length === 0 && (
-                        <div className="col-span-full text-center text-gray-500 py-8 font-bold tracking-wide">
+                        <div className="col-span-full text-center text-gray-500 py-10 font-bold tracking-wide border border-dashed border-white/10 rounded-sm bg-black/30">
                           監督の出場選手提出を待っています。
                         </div>
                       )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -157,11 +171,12 @@ export default async function MatchesPage() {
 
           <div className="space-y-8">
             {finishedMatches.map((match) => (
-              <div key={match.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden hover:border-white/30 transition-colors">
+              <div key={match.id} className="bg-[#0f0f0f] border border-white/10 rounded-sm overflow-hidden hover:border-white/30 transition-colors shadow-[0_0_24px_rgba(0,0,0,0.25)]">
                 
                 {/* 試合タイトル帯 */}
-                <div className="bg-black/50 border-b border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center">
+                <div className="bg-black/70 border-b border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center">
                   <div className="font-bold tracking-widest text-yellow-500">{match.title}</div>
+                  <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-bold">RESULTS</div>
                 </div>
 
                 {/* 順位（1着〜4着）のリスト */}
@@ -172,21 +187,21 @@ export default async function MatchesPage() {
                     const rankColor = rankColors[index] || "text-gray-500";
 
                     return (
-                      <div key={res.id} className="flex items-center justify-between gap-3 bg-black/30 border border-white/5 p-3 rounded-sm relative overflow-hidden">
+                      <div key={res.id} className="flex items-center justify-between gap-3 bg-black/40 border border-white/10 p-3 rounded-sm relative overflow-hidden">
                         {/* チームカラーのサイドライン */}
                         <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: res.player.team?.color || '#333' }}></div>
                         
                         <div className="flex items-center gap-3 sm:gap-4 pl-4 flex-grow min-w-0">
-                          <div className={`font-black italic text-xl ${rankColor} w-8`}>
+                          <div className={`font-black italic text-xl ${rankColor} w-8 text-center`}>
                             {index + 1}
                           </div>
-                          <div>
-                            <div className="text-[10px] text-gray-500 tracking-widest uppercase">{res.player.team?.name}</div>
+                          <div className="min-w-0">
+                            <div className="text-[10px] text-gray-500 tracking-widest uppercase truncate">{res.player.team?.name}</div>
                             <div className="font-bold text-white tracking-wider truncate">{res.player.name}</div>
                           </div>
                         </div>
 
-                        <div className="text-right pr-2">
+                        <div className="text-right pr-2 shrink-0">
                           <div className="text-[10px] text-gray-500 tracking-widest uppercase mb-0.5">
                             {(res.rawScore ?? 0).toLocaleString()}
                           </div>

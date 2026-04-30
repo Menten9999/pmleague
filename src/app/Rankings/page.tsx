@@ -166,107 +166,88 @@ export default async function RankingsPage() {
             </div>
           </section>
 
-          <section>
+          <section className="lg:col-span-2">
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 pb-2">
               <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">PLAYER RANKING</h2>
               <span className="text-[10px] text-gray-500 tracking-widest uppercase">個人成績</span>
             </div>
-            
-            {/* ポイントランキング */}
-            <div className="mb-12">
-              <div className="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-3 pl-2 border-l-2 border-yellow-600">ポイント</div>
-              <div className="space-y-3">
-                {players.map((player, index) => (
-                  <div key={player.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
-                    <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
 
-                    <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
-                      <div className="w-6 md:w-8 text-center font-black italic text-xl md:text-2xl text-gray-600 shrink-0">{index + 1}</div>
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-black border border-white/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-[6px] text-gray-500">PHOTO</span>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-4">
+              <div className="bg-[#0f0f0f] border border-white/10 rounded-sm overflow-hidden">
+                <div className="px-4 py-3 bg-black/70 border-b border-yellow-600/20 flex items-center justify-between gap-3">
+                  <div className="text-sm font-bold text-yellow-500 tracking-[0.2em] uppercase">ポイント</div>
+                  <div className="text-[10px] text-gray-500 tracking-widest uppercase">総合スコア</div>
+                </div>
+                <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
+                  {players.map((player, index) => (
+                    <div key={player.id} className="bg-black/40 border border-white/10 p-3 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
+                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
+                      <div className="m-ranking-left gap-3 flex-grow pr-3">
+                        <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
+                        <div className="min-w-0 flex flex-col">
+                          <div className="text-sm font-bold tracking-wider truncate">{player.name}</div>
+                          <div className="text-[10px] text-gray-500 tracking-widest uppercase truncate">{player.team?.name}</div>
+                        </div>
                       </div>
-                      <div className="flex flex-col truncate">
-                        <div className="text-sm md:text-lg font-bold tracking-wider truncate">{player.name}</div>
-                        <div className="text-[8px] md:text-[10px] text-gray-500 tracking-widest uppercase mt-0.5 truncate">{player.team?.name}</div>
-                      </div>
-                    </div>
-
-                    <div className="m-ranking-right gap-3 md:gap-6">
-                      <div className={`text-lg md:text-2xl font-mono font-bold w-16 md:w-24 text-right shrink-0 ${player.totalScore >= 0 ? 'text-white' : 'text-red-500'}`}>
+                      <div className={`text-lg font-mono font-bold w-20 text-right shrink-0 ${player.totalScore >= 0 ? 'text-white' : 'text-red-500'}`}>
                         {player.totalScore > 0 ? '+' : ''}{player.totalScore.toFixed(1)}
                       </div>
                     </div>
-                  </div>
-                ))}
-                {players.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                  ))}
+                  {players.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                </div>
               </div>
-            </div>
 
-            {/* トップ数ランキング */}
-            <div className="mb-12">
-              <div className="text-xs font-bold text-green-600 uppercase tracking-wider mb-3 pl-2 border-l-2 border-green-600">トップ数</div>
-              <div className="space-y-3">
-                {topCountRanked.map((player, index) => (
-                  <div key={player.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
-                    <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
-                    
-                    <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
-                      <div className="w-6 md:w-8 text-center font-black italic text-xl md:text-2xl text-gray-600 shrink-0">{index + 1}</div>
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-black border border-white/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-[6px] text-gray-500">PHOTO</span>
+              <div className="bg-[#0f0f0f] border border-white/10 rounded-sm overflow-hidden">
+                <div className="px-4 py-3 bg-black/70 border-b border-green-600/20 flex items-center justify-between gap-3">
+                  <div className="text-sm font-bold text-green-400 tracking-[0.2em] uppercase">トップ数</div>
+                  <div className="text-[10px] text-gray-500 tracking-widest uppercase">1位回数</div>
+                </div>
+                <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
+                  {topCountRanked.map((player, index) => (
+                    <div key={player.id} className="bg-black/40 border border-white/10 p-3 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
+                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
+                      <div className="m-ranking-left gap-3 flex-grow pr-3">
+                        <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
+                        <div className="min-w-0 flex flex-col">
+                          <div className="text-sm font-bold tracking-wider truncate">{player.name}</div>
+                          <div className="text-[10px] text-gray-500 tracking-widest uppercase truncate">{player.team?.name}</div>
+                        </div>
                       </div>
-                      <div className="flex flex-col truncate">
-                        <div className="text-sm md:text-lg font-bold tracking-wider truncate">{player.name}</div>
-                        <div className="text-[8px] md:text-[10px] text-gray-500 tracking-widest uppercase mt-0.5 truncate">{player.team?.name}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="m-ranking-right gap-3 md:gap-6">
-                      <div className="text-lg md:text-2xl font-mono font-bold w-16 md:w-24 text-right text-green-400 shrink-0">
-                        {player.topCount}回
-                      </div>
-                      <div className="w-20 md:w-32 text-right text-[9px] md:text-xs text-gray-400 shrink-0">
-                        <div>PT:{player.totalScore > 0 ? '+' : ''}{player.totalScore.toFixed(1)}</div>
-                        <div>試合:{player.totalMatches}</div>
+                      <div className="text-right shrink-0">
+                        <div className="text-lg font-mono font-bold text-green-400">{player.topCount}回</div>
+                        <div className="text-[10px] text-gray-500 tracking-widest uppercase">PT {player.totalScore > 0 ? '+' : ''}{player.totalScore.toFixed(1)}</div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {topCountRanked.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                  ))}
+                  {topCountRanked.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                </div>
               </div>
-            </div>
 
-            {/* ラス回避率ランキング */}
-            <div>
-              <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3 pl-2 border-l-2 border-blue-600">ラス回避率</div>
-              <div className="space-y-3">
-                {lastAvoidRanked.map((player, index) => (
-                  <div key={player.id} className="bg-[#111] border border-white/10 p-3 md:p-4 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
-                    <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
-                    
-                    <div className="m-ranking-left gap-3 md:gap-4 flex-grow pr-4">
-                      <div className="w-6 md:w-8 text-center font-black italic text-xl md:text-2xl text-gray-600 shrink-0">{index + 1}</div>
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-black border border-white/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-[6px] text-gray-500">PHOTO</span>
+              <div className="bg-[#0f0f0f] border border-white/10 rounded-sm overflow-hidden">
+                <div className="px-4 py-3 bg-black/70 border-b border-blue-600/20 flex items-center justify-between gap-3">
+                  <div className="text-sm font-bold text-blue-400 tracking-[0.2em] uppercase">ラス回避率</div>
+                  <div className="text-[10px] text-gray-500 tracking-widest uppercase">最下位回避</div>
+                </div>
+                <div className="p-3 space-y-2 max-h-[560px] overflow-y-auto custom-scrollbar">
+                  {lastAvoidRanked.map((player, index) => (
+                    <div key={player.id} className="bg-black/40 border border-white/10 p-3 rounded-sm relative overflow-hidden transition-colors hover:border-white/30 m-ranking-row">
+                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: player.team?.color || '#eab308' }}></div>
+                      <div className="m-ranking-left gap-3 flex-grow pr-3">
+                        <div className="w-6 text-center font-black italic text-lg text-gray-500 shrink-0">{index + 1}</div>
+                        <div className="min-w-0 flex flex-col">
+                          <div className="text-sm font-bold tracking-wider truncate">{player.name}</div>
+                          <div className="text-[10px] text-gray-500 tracking-widest uppercase truncate">{player.team?.name}</div>
+                        </div>
                       </div>
-                      <div className="flex flex-col truncate">
-                        <div className="text-sm md:text-lg font-bold tracking-wider truncate">{player.name}</div>
-                        <div className="text-[8px] md:text-[10px] text-gray-500 tracking-widest uppercase mt-0.5 truncate">{player.team?.name}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="m-ranking-right gap-3 md:gap-6">
-                      <div className="text-lg md:text-2xl font-mono font-bold w-16 md:w-24 text-right text-blue-400 shrink-0">
-                        {player.avoidLastRate}%
-                      </div>
-                      <div className="w-20 md:w-32 text-right text-[9px] md:text-xs text-gray-400 shrink-0">
-                        <div>T:{player.topCount}</div>
-                        <div>L:{player.lastCount}/{player.totalMatches}</div>
+                      <div className="text-right shrink-0">
+                        <div className="text-lg font-mono font-bold text-blue-400">{player.avoidLastRate}%</div>
+                        <div className="text-[10px] text-gray-500 tracking-widest uppercase">L {player.lastCount}/{player.totalMatches}</div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {lastAvoidRanked.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                  ))}
+                  {lastAvoidRanked.length === 0 && <div className="text-center text-gray-500 py-10 font-bold tracking-widest text-sm">NO DATA</div>}
+                </div>
               </div>
             </div>
           </section>

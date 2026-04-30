@@ -162,20 +162,20 @@ export default async function MatchesPage() {
         {/* =========================================
             試合結果（MATCH HISTORY）セクション
             ========================================= */}
-        <section className="pm-board-section">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5 pm-board-section-head">
+        <section className="pm-board-section pm-history-section">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/10 px-4 sm:px-6 py-4 bg-white/5 pm-board-section-head pm-history-section-head">
             <h2 className="text-2xl font-black italic tracking-wider text-yellow-500">
               MATCH HISTORY
             </h2>
             <span className="text-[10px] text-gray-500 tracking-widest uppercase">過去の試合結果</span>
           </div>
 
-          <div className="p-4 sm:p-6 space-y-8 pm-board-inner">
+            <div className="p-4 sm:p-6 space-y-8 pm-board-inner">
             {finishedMatches.map((match) => (
-              <div key={match.id} className="bg-[#0f0f0f] border border-white/15 rounded-xl overflow-hidden hover:border-white/30 transition-colors shadow-[0_0_24px_rgba(0,0,0,0.25)] pm-board-card">
+              <div key={match.id} className="bg-[#0f0f0f] border border-white/15 rounded-xl overflow-hidden hover:border-white/30 transition-colors shadow-[0_0_24px_rgba(0,0,0,0.25)] pm-board-card pm-history-card">
                 
                 {/* 試合タイトル帯 */}
-                <div className="bg-black/70 border-b border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center pm-board-card-head">
+                <div className="bg-black/70 border-b border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center pm-board-card-head pm-history-card-head">
                   <div className="font-bold tracking-widest text-yellow-500">{match.title}</div>
                   <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-bold">RESULTS</div>
                 </div>
@@ -188,7 +188,7 @@ export default async function MatchesPage() {
                     const rankColor = rankColors[index] || "text-gray-500";
 
                     return (
-                      <div key={res.id} className="flex items-center justify-between gap-3 bg-black/40 border border-white/15 p-3 rounded-lg relative overflow-hidden pm-board-row">
+                      <div key={res.id} className="flex items-center justify-between gap-3 bg-black/40 border border-white/15 p-3 rounded-lg relative overflow-hidden pm-board-row pm-history-row">
                         {/* チームカラーのサイドライン */}
                         <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: res.player.team?.color || '#333' }}></div>
                         
@@ -218,7 +218,7 @@ export default async function MatchesPage() {
             ))}
 
             {finishedMatches.length === 0 && (
-              <div className="text-center text-gray-500 py-20 font-bold tracking-widest border border-dashed border-white/10 rounded-xl bg-black/20 pm-board-outline">
+              <div className="text-center text-gray-500 py-20 font-bold tracking-widest border border-dashed border-white/10 rounded-xl bg-black/20 pm-board-outline pm-history-outline">
                 まだ試合結果がありません。
               </div>
             )}

@@ -54,3 +54,27 @@ npx --yes vercel --prod --yes
 ```bash
 npm run build
 ```
+
+## GitHub: リポジトリを組織に移した後のローカル操作
+
+組織 `PMLeague` にリポジトリを移動した後、ローカルの `origin` を新しいリポジトリに切り替えてプッシュしてください。SSH/HTTPS のいずれかを選んで実行します。
+
+SSH:
+
+```bash
+git remote set-url origin git@github.com:PMLeague/pmleague.git
+git push -u origin master
+```
+
+HTTPS:
+
+```bash
+git remote set-url origin https://github.com/PMLeague/pmleague.git
+git push -u origin master
+```
+
+もしデフォルトブランチが `main` の場合は `master` を `main` に置き換えてください。
+
+---
+
+自動コミット: 組織移行テスト（軽微なドキュメントの追記）
